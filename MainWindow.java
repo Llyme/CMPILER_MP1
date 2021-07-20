@@ -3,6 +3,9 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.layout.FillLayout;
+
+import java.util.stream.Stream;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Menu;
@@ -11,17 +14,22 @@ import org.eclipse.wb.swt.SWTResourceManager;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.widgets.Label;
 
 public class MainWindow {
 
+	private static MainWindow self;
 	protected Shell shlScanner;
 	private Text editor;
 	private Text console;
-	private static MainWindow self;
 	private Text console_input;
+	private Label scanLine;
+	private Scanner scanner = new Scanner();
+	private int line = 0;
 	
 	public static String getEditorText() {
 		return self.editor.getText();
@@ -33,6 +41,15 @@ public class MainWindow {
 	
 	public static void clearConsoleText() {
 		self.console.setText("");
+	}
+	
+	private static void setLine(int i) {
+		self.line = i;
+		
+		if (i > -1)
+			self.scanLine.setText("Cursor is in line " + (i + 1) + ".");
+		else
+			self.scanLine.setText("Cursor is at the end.");
 	}
 	
 	/**
@@ -85,45 +102,70 @@ public class MainWindow {
 		MenuItem fileOpen = new MenuItem(fileMenu, SWT.NONE);
 		fileOpen.setText("Open");
 		
-		MenuItem mntmScan = new MenuItem(menu, SWT.CASCADE);
-		mntmScan.setText("Scan");
-		
-		Menu scanMenu = new Menu(mntmScan);
-		mntmScan.setMenu(scanMenu);
-		
-		MenuItem scanContinuous = new MenuItem(scanMenu, SWT.NONE);
-		scanContinuous.setText("Continuous");
-		scanContinuous.addSelectionListener(new SelectionListener() {
-
-			@Override
-			public void widgetDefaultSelected(SelectionEvent arg0) {}
-
-			@Override
-			public void widgetSelected(SelectionEvent arg0) {
-				clearConsoleText();
-				Scanner.read_line(getEditorText());
-			}
-		});
-		
-		MenuItem scanPerLine = new MenuItem(scanMenu, SWT.NONE);
-		scanPerLine.setText("Per Line");
-		scanPerLine.addSelectionListener(new SelectionListener() {
-
-			@Override
-			public void widgetDefaultSelected(SelectionEvent arg0) {}
-
-			@Override
-			public void widgetSelected(SelectionEvent arg0) {
-				clearConsoleText();
-				Scanner.read_line(getEditorText());
-			}
-		});
-		
 		SashForm sashForm = new SashForm(shlScanner, SWT.SMOOTH);
 		sashForm.setSashWidth(10);
 		
-		editor = new Text(sashForm, SWT.H_SCROLL | SWT.V_SCROLL | SWT.CANCEL | SWT.MULTI);
+		SashForm sashForm_3 = new SashForm(sashForm, SWT.SMOOTH | SWT.VERTICAL);
+		sashForm_3.setSashWidth(0);
+		
+		editor = new Text(sashForm_3, SWT.H_SCROLL | SWT.V_SCROLL | SWT.CANCEL | SWT.MULTI);
 		editor.setFont(SWTResourceManager.getFont("Consolas", 12, SWT.NORMAL));
+		
+		scanLine = new Label(sashForm_3, SWT.NONE);
+		scanLine.setAlignment(SWT.CENTER);
+		scanLine.setText("Cursor is in line 1.");
+		
+		SashForm sashForm_4 = new SashForm(sashForm_3, SWT.NONE);
+		
+		Button scanReset = new Button(sashForm_4, SWT.NONE);
+		scanReset.setText("Reset");
+		scanReset.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				scanner = new Scanner();
+				clearConsoleText();
+				setLine(0);
+			}
+		});
+		
+		Button scanNextLine = new Button(sashForm_4, SWT.NONE);
+		scanNextLine.setText("Next Line");
+		scanNextLine.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				if (line == -1)
+					return;
+				
+				String[] lines = getEditorText().split("\\r?\\n");
+				scanner.read_line(lines[line]);
+				
+				if (line == lines.length - 1)
+					setLine(-1);
+				else
+					setLine(line + 1);
+			}
+		});
+		
+		Button scanAll = new Button(sashForm_4, SWT.NONE);
+		scanAll.setText("Scan All");
+		scanAll.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				if (line == -1)
+					return;
+				
+				String[] lines = getEditorText().split("\\r?\\n");
+				
+				for (; line < lines.length; line++)
+					scanner.read_line(lines[line]);
+				
+				setLine(-1);
+			}
+		});
+		
+		
+		sashForm_4.setWeights(new int[] {1, 1, 1});
+		sashForm_3.setWeights(new int[] {552, 24, 24});
 		
 		SashForm sashForm_1 = new SashForm(sashForm, SWT.SMOOTH | SWT.VERTICAL);
 		sashForm_1.setSashWidth(0);
@@ -144,7 +186,7 @@ public class MainWindow {
 		});
 		console_input_submit.setText("Submit");
 		sashForm_2.setWeights(new int[] {400, 100});
-		sashForm_1.setWeights(new int[] {600, 30});
+		sashForm_1.setWeights(new int[] {576, 24});
 		sashForm.setWeights(new int[] {1, 1});
 
 		sashForm_2.addListener(SWT.Resize, new Listener() {
@@ -171,6 +213,22 @@ public class MainWindow {
 					int weight = 230000 / height;
 					sashForm_1.setWeights(new int[] {
 							10000 - weight,
+							weight
+					});
+				}
+			}
+		});
+		
+		sashForm_3.addListener(SWT.Resize, new Listener() {
+			@Override
+			public void handleEvent(Event arg0) {
+				int height = sashForm_3.getClientArea().height;
+				
+				if (height > 36) {
+					int weight = 230000 / height;
+					sashForm_3.setWeights(new int[] {
+							10000 - weight * 2,
+							weight,
 							weight
 					});
 				}

@@ -43,7 +43,13 @@ public class Scanner {
 		">="
 	};
 	
-	public static int read_line(String line) {
+	/**
+	 * If the scanner is in comment mode.
+	 * This allows multiline comment across multiple feed.
+	 */
+	private String comment = null;
+	
+	public int read_line(String line) {
 		int start = 0;
 		
 		while (start < line.length()) {
@@ -54,7 +60,12 @@ public class Scanner {
 			if (lexeme.length() == 0)
 				continue;
 			
-			console_dump(lexeme.trim(), classify_lexeme(lexeme));
+			if (comment != null)
+				continue;
+			
+			String token_class = classify_lexeme(lexeme);
+			console_dump(lexeme, token_class);
+			parse(lexeme, token_class);
 		}
 		//new Scanner(line).run();
 		
@@ -68,7 +79,7 @@ public class Scanner {
 	 * @param line A line of code.
 	 * @return Lexeme.
 	 */
-	public static String get_lexeme(int start, String line) {
+	public String get_lexeme(int start, String line) {
 		Boolean begin = false;
 		Character literal = null;
 		int backslash = 0;
@@ -91,7 +102,11 @@ public class Scanner {
 				continue;
 				
 			} else if (c == '"' || c == '\'' || c == '`') {
-				// Literal mode for strings.
+				// Literal mode.
+				if (comment != null)
+					// In comment mode.
+					continue;
+				
 				if (literal != null) {
 					// In literal mode.
 					if (literal != c)
@@ -110,17 +125,17 @@ public class Scanner {
 					literal = c;
 				
 			} else if (c == '{') {
-				// Literal mode for comments.
+				// Comment mode.
 				if (literal != null)
+					// In literal mode.
 					continue;
 				
-				// Start literal mode with right brace
-				// as terminating character.
-				literal = '}';
+				// Enter comment mode.
+				comment = "";
 				
 			} else if (c == '}') {
-				// Literal mode for comments.
-				if (literal == null || literal != c)
+				// Attempting to exit comment mode.
+				if (comment == null)
 					continue;
 
 				if (backslash > 0)
@@ -128,12 +143,18 @@ public class Scanner {
 					continue;
 				
 				// Terminate lexeme.
-				return line.substring(start, i + 1);
+				String full = comment + line.substring(start, i + 1);
+				comment = null;
+				return full;
 				
 			} else if (c == '\\') {
-				if (literal != null)
+				if (literal != null || comment != null)
 					// Toggle backslash mode only during literal mode.
 					backslash = 2;
+				
+			} else if (comment != null) {
+				// Currently in comment mode.
+				continue;
 				
 			} else if (c == '\n') {
 				// Newline terminates lexeme, except for comments.
@@ -162,11 +183,14 @@ public class Scanner {
 			}
 		}
 		
+		if (comment != null)
+			return comment += line.substring(start) + "\n";
+		
 		// Return the line if no terminating characters were found.
 		return line.substring(start);
 	}
 	
-	public static String classify_lexeme(String lexeme) {
+	public String classify_lexeme(String lexeme) {
 		if (contains(reserved, lexeme))
 			return "reserved";
 		
@@ -213,16 +237,20 @@ public class Scanner {
 		return "unknown";
 	}
 	
-	public static int console_dump(String lexeme, String token_class) {
+	public int console_dump(String lexeme, String token_class) {
 		MainWindow.appendConsoleText(lexeme + "			" + token_class);
 		return 0;
 	}
 	
-	/*public static int file_dump(File outputFile, String lexeme, String token_class) {
+	/*public int file_dump(File outputFile, String lexeme, String token_class) {
 		
 	}*/
 	
 	public void print_error(String code) {
+		
+	}
+	
+	public void parse(String lexeme, String token_class) {
 		
 	}
 	
