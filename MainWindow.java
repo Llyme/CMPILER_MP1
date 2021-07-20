@@ -125,6 +125,7 @@ public class MainWindow {
 				scanner = new Scanner();
 				clearConsoleText();
 				setLine(0);
+				editor.setEditable(true);
 			}
 		});
 		
@@ -143,6 +144,8 @@ public class MainWindow {
 					setLine(-1);
 				else
 					setLine(line + 1);
+
+				editor.setEditable(false);
 			}
 		});
 		
@@ -160,6 +163,7 @@ public class MainWindow {
 					scanner.read_line(lines[line]);
 				
 				setLine(-1);
+				editor.setEditable(false);
 			}
 		});
 		
