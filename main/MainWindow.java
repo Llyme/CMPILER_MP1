@@ -1,10 +1,9 @@
+package main;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.layout.FillLayout;
-
-import java.util.stream.Stream;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Text;
@@ -13,10 +12,7 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.wb.swt.SWTResourceManager;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.widgets.Label;
 
@@ -30,6 +26,10 @@ public class MainWindow {
 	private Label scanLine;
 	private Scanner scanner = new Scanner();
 	private int line = 0;
+	
+	public static int getLine() {
+		return self.line + 1;
+	}
 	
 	public static String getEditorText() {
 		return self.editor.getText();
@@ -181,6 +181,7 @@ public class MainWindow {
 		sashForm_2.setSashWidth(0);
 		
 		console_input = new Text(sashForm_2, SWT.BORDER);
+		console_input.setText("");
 		
 		Button console_input_submit = new Button(sashForm_2, SWT.NONE);
 		console_input_submit.addSelectionListener(new SelectionAdapter() {
