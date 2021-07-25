@@ -2,16 +2,8 @@ package main;
 import java.util.ArrayList;
 import java.util.Stack;
 
-import identifier.IIdentifier;
-import identifier.IdentifierBoolean;
-import identifier.IdentifierFunction;
-import identifier.IdentifierProcedure;
-import identifier.IdentifierType;
-import logic.BodyLogic;
-import logic.FunctionLogic;
-import logic.ProcedureLogic;
-import logic.ProgramLogic;
-import logic.VarLogic;
+import identifier.*;
+import logic.*;
 
 public class Scanner {
 	private ArrayList<IIdentifier> identifiers = new ArrayList<IIdentifier>();
@@ -22,7 +14,7 @@ public class Scanner {
 	private String comment = null;
 	private String programName = null;
 	private String currentLine = null;
-	private Stack<ScanMode> modes = new Stack<ScanMode>();
+	public Stack<ScanMode> modes = new Stack<ScanMode>();
 	private DeclarationType declarationType = DeclarationType.Program;
 	private BodyType bodyType = BodyType.Main;
 	private Boolean waitingUserInput = false;
@@ -60,23 +52,20 @@ public class Scanner {
 		identifiers.add(new IdentifierFunction(
 			"read",
 			true,
-			null,
-			"string"
+			false,
+			"" // Passing an empty string ignores data type.
 		));
-		identifiers.add(new IdentifierFunction(
+		identifiers.add(new IdentifierProcedure(
 			"write",
 			true,
-			null,
-			"string",
-			// Allows extending parameters,
-			// where data type is equal to the last data type.
-			(String)null
+			true,
+			""
 		));
 		identifiers.add(new IdentifierType("char", true));
 		identifiers.add(new IdentifierType("integer", true));
 		identifiers.add(new IdentifierBoolean("false", true, false));
-		identifiers.add(new IdentifierFunction("readln", true, null, "string"));
-		identifiers.add(new IdentifierFunction("writeln", true, null, "string", (String)null));
+		identifiers.add(new IdentifierFunction("readln", true, false, null, ""));
+		identifiers.add(new IdentifierProcedure("writeln", true, true, ""));
 		identifiers.add(new IdentifierType("string", true));
 	}
 	
@@ -100,8 +89,27 @@ public class Scanner {
 		return modes.pop();
 	}
 	
-	public void pushMode(ScanMode mode) {
-		modes.push(mode);
+	/*public ScanMode popMode() {
+		ScanMode result = modes.pop();
+		String log = "Mode";
+		
+		for (ScanMode mode : modes)
+			log += " -> " + mode;
+		
+		MainWindow.appendConsoleText(log);
+		return result;
+	}*/
+	
+	public void pushMode(ScanMode... modes) {
+		for (ScanMode mode : modes)
+			this.modes.push(mode);
+
+		/*String log = "Mode";
+		
+		for (ScanMode mode : this.modes)
+			log += " -> " + mode;
+		
+		MainWindow.appendConsoleText(log);*/
 	}
 	
 	public DeclarationType getDeclarationType() {
@@ -355,6 +363,9 @@ public class Scanner {
 		if (Helper.contains(Resources.relational_operators, lexeme))
 			return "relational operator";
 		
+		if (Helper.contains(Resources.boolean_operators, lexeme))
+			return "boolean operator";
+		
 		if (Helper.contains(Resources.data_types, lexeme))
 			return "data type";
 		
@@ -412,10 +423,20 @@ public class Scanner {
 	}*/
 	
 	public void print_error(int code) {
-		MainWindow.appendConsoleText("Error at line " + MainWindow.getLine() + "; code " + code + ".");
+		MainWindow.appendConsoleText(
+			"Error at line " + MainWindow.getLine() +
+			"; code " + code
+		);
 		
 		if (code >= 0 && code < Resources.error_codes.length)
 			MainWindow.appendConsoleText(Resources.error_codes[code]);
+		
+		String log = "Mode";
+		
+		for (ScanMode mode : this.modes)
+			log += " -> " + mode;
+		
+		MainWindow.appendConsoleText(log);
 	}
 	
 	/**
@@ -430,19 +451,34 @@ public class Scanner {
 		
 		int result;
 		
-		if ((result = ProgramLogic.parse(this, lexeme, token_class)) > 0)
+		if ((result = GeneralLogic.parse(this, lexeme, token_class)) != 0)
 			return result == 1;
 		
-		if ((result = VarLogic.parse(this, lexeme, token_class)) > 0)
+		if ((result = ProgramLogic.parse(this, lexeme, token_class)) != 0)
 			return result == 1;
 		
-		if ((result = ProcedureLogic.parse(this, lexeme, token_class)) > 0)
+		if ((result = VarLogic.parse(this, lexeme, token_class)) != 0)
 			return result == 1;
 		
-		if ((result = FunctionLogic.parse(this, lexeme, token_class)) > 0)
+		if ((result = ProcedureLogic.parse(this, lexeme, token_class)) != 0)
 			return result == 1;
 		
-		if ((result = BodyLogic.parse(this, lexeme, token_class)) > 0)
+		if ((result = FunctionLogic.parse(this, lexeme, token_class)) != 0)
+			return result == 1;
+		
+		if ((result = BodyLogic.parse(this, lexeme, token_class)) != 0)
+			return result == 1;
+		
+		if ((result = ArithmeticLogic.parse(this, lexeme, token_class)) != 0)
+			return result == 1;
+		
+		if ((result = ForLoopLogic.parse(this, lexeme, token_class)) != 0)
+			return result == 1;
+		
+		if ((result = IfThenElseLogic.parse(this, lexeme, token_class)) != 0)
+			return result == 1;
+		
+		if ((result = ExpressionLogic.parse(this, lexeme, token_class)) != 0)
 			return result == 1;
 		
 		return false;

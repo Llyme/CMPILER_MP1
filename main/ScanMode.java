@@ -2,6 +2,16 @@ package main;
 
 public enum ScanMode {
 	/**
+	 * Expecting a semicolon.
+	 */
+	Semicolon,
+	/**
+	 * Expecting a dot.
+	 */
+	Dot,
+	
+	
+	/**
 	 * When the scanner expects a program name.
 	 */
 	Program,
@@ -61,6 +71,10 @@ public enum ScanMode {
 	 * close parenthesis -> semicolon
 	 */
 	ProcedureExit0,
+	/**
+	 * Semicolon at the end of body declaration.
+	 */
+	ProcedureExit1,
 	
 	
 	/**
@@ -112,6 +126,10 @@ public enum ScanMode {
 	 * data type -> semicolon
 	 */
 	FunctionExit2,
+	/**
+	 * Semicolon at the end of body declaration.
+	 */
+	FunctionExit3,
 	
 	
 	/**
@@ -126,10 +144,38 @@ public enum ScanMode {
 	BodyIdentifier0,
 	BodyAssignment0,
 	BodyAssignment1,
-	BodyArithmetic0,
-	BodyArithmetic1,
 	BodyProcedure0,
 	BodyProcedure1,
 	BodyProcedure2,
-	BodyProcedure3
+	BodyProcedure3,
+	
+
+	Arithmetic0,
+	Arithmetic1,
+	ArithmeticGroup0,
+	ArithmeticGroup1,
+	
+	
+	ForLoop0,
+	ForLoop1,
+	ForLoop2,
+	ForLoop3,
+	ForLoop4,
+	ForLoop5,
+	ForLoop6,
+	ForLoop7,
+	
+	
+	If0,
+	If1,
+	If2,
+	If3,
+	Else0,
+	Else1,
+	
+	
+	Expression0,
+	Expression1,
+	Expression2,
+	Expression3
 }

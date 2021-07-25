@@ -26,8 +26,8 @@ public class IdentifierCharacter implements IIdentifier {
 		return value;
 	}
 
-	public void setValue(Object value) {
-		this.value = (char) value;
+	public void setValue(String lexeme) {
+		this.value = lexeme.charAt(0);
 	}
 
 	public Boolean isValid(String lexeme) {

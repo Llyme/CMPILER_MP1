@@ -26,8 +26,8 @@ public class IdentifierBoolean implements IIdentifier {
 		return value;
 	}
 
-	public void setValue(Object value) {
-		this.value = (Boolean) value;
+	public void setValue(String lexeme) {
+		this.value = Boolean.parseBoolean(lexeme);
 	}
 
 	public Boolean isValid(String lexeme) {

@@ -24,12 +24,14 @@ public class IdentifierType implements IIdentifier {
 		return this;
 	}
 
-	public void setValue(Object value) {
+	@Deprecated
+	public void setValue(String lexeme) {
 	}
 
 	/**
 	 * Data types are immutable and should not be edited.
 	 */
+	@Deprecated
 	public Boolean isValid(String lexeme) {
 		return false;
 	}

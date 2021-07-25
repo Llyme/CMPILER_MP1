@@ -122,13 +122,24 @@ public abstract class ProcedureLogic {
 			IdentifierProcedure target = new IdentifierProcedure(
 				identifier,
 				false,
+				false,
 				parameterTypes.toArray(params)
 			);
 			scanner.addIdentifier(target);
 			scanner.setTargetProcedure(target);
 			scanner.setBodyType(BodyType.Procedure);
 			scanner.popMode();
-			scanner.pushMode(ScanMode.BodyDeclare0);
+			scanner.pushMode(ScanMode.ProcedureExit1, ScanMode.BodyDeclare0);
+			return 1;
+		case ProcedureExit1:
+			if (!token_class.equals("semicolon")) {
+				scanner.print_error(3);
+				return 2;
+			}
+			
+			scanner.setTargetProcedure(null);
+			scanner.setBodyType(BodyType.Main);
+			scanner.popMode();
 			return 1;
 		default:
 			return 0;

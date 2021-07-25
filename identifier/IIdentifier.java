@@ -29,5 +29,5 @@ public interface IIdentifier {
 	/**
 	 * Overwrites the value stored in this identifier.
 	 */
-	public void setValue(Object value);
+	public void setValue(String lexeme);
 }

@@ -33,7 +33,8 @@ public final class Resources {
 		"+",
 		"-",
 		"/",
-		"*"
+		"*",
+		"mod"
 	};
 	
 	public static String[] relational_operators = new String[] {
@@ -43,6 +44,12 @@ public final class Resources {
 		">",
 		"<=",
 		">="
+	};
+	
+	public static String[] boolean_operators = new String[] {
+		"and",
+		"or",
+		"not"
 	};
 	
 	public static String[] data_types = new String[] {
@@ -78,7 +85,9 @@ public final class Resources {
 		"Procedure and function declaration should be done before the main program!", // 20
 		"Expected comma or close parenthesis!", // 21
 		"Expected close parenthesis!", // 22
-		"Identifier is not a function!", // 23
-		"Procedure/function parameter count mismatch!" // 24
+		"Identifier is not callable!", // 23
+		"Procedure/function parameter count mismatch!", // 24
+		"Expected assignment token!", // 25
+		"Invalid syntax for this data type!" // 26
 	};
 }

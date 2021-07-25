@@ -6,15 +6,16 @@ public class IdentifierFunction extends IdentifierProcedure implements IIdentifi
 	public IdentifierFunction
 	(String name,
 	Boolean predeclared,
+	Boolean varargs,
 	String returnType,
 	String... parameterTypes) {
-		super(name, predeclared, parameterTypes);
+		super(name, predeclared, varargs, parameterTypes);
 		this.returnType = returnType;
 	}
 	
 	@Override
 	public String getDataType() {
-		return "procedure";
+		return "function";
 	}
 	
 	public String getReturnType() {

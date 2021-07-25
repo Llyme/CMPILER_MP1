@@ -15,7 +15,7 @@ public class IdentifierInteger implements IIdentifier {
 	}
 	
 	public String getDataType() {
-		return "character";
+		return "integer";
 	}
 	
 	public Boolean isPredeclared() {
@@ -26,8 +26,8 @@ public class IdentifierInteger implements IIdentifier {
 		return value;
 	}
 
-	public void setValue(Object value) {
-		this.value = (int) value;
+	public void setValue(String lexeme) {
+		this.value = Integer.parseInt(lexeme);
 	}
 
 	public Boolean isValid(String lexeme) {

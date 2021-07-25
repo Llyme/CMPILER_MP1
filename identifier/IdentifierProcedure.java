@@ -2,21 +2,29 @@ package identifier;
 
 import java.util.ArrayList;
 
-import main.MainWindow;
-
 public class IdentifierProcedure implements IIdentifier {
 	private String name;
 	private Boolean predeclared;
 	private ArrayList<String> lexemes = new ArrayList<String>();
 	private ArrayList<String> token_classes = new ArrayList<String>();
 	private ArrayList<String> parameterTypes = new ArrayList<String>();
+	/**
+	 * Allows extensible parameters.
+	 * The extended parameters are the same as the last parameter type.
+	 */
+	private Boolean varargs;
 	
+	/**
+	 * Passing a parameter type with empty string ignores data type.
+	 */
 	public IdentifierProcedure
 	(String name,
 	Boolean predeclared,
+	Boolean varargs,
 	String... parameterTypes) {
 		this.name = name;
 		this.predeclared = predeclared;
+		this.varargs = varargs;
 		
 		for (String text : parameterTypes)
 			this.parameterTypes.add(text);
@@ -40,7 +48,6 @@ public class IdentifierProcedure implements IIdentifier {
 	public void push(String lexeme, String token_class) {
 		lexemes.add(lexeme);
 		token_classes.add(token_class);
-		MainWindow.appendConsoleText("WRITING: " + lexeme + ", " + token_class);
 	}
 	
 	public String getLexeme(int i) {
@@ -56,7 +63,16 @@ public class IdentifierProcedure implements IIdentifier {
 	}
 	
 	public String getParameterType(int i) {
+		int last = parameterTypes.size() - 1;
+		
+		if (i > last && varargs)
+			return parameterTypes.get(last);
+		
 		return parameterTypes.get(i);
+	}
+	
+	public Boolean hasVarargs() {
+		return varargs;
 	}
 	
 	@Deprecated
@@ -65,7 +81,7 @@ public class IdentifierProcedure implements IIdentifier {
 	}
 
 	@Deprecated
-	public void setValue(Object value) {
+	public void setValue(String lexeme) {
 	}
 
 	/**

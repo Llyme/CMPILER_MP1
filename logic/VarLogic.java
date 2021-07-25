@@ -105,7 +105,7 @@ public abstract class VarLogic {
 			switch (lexeme) {
 			case "begin":
 				scanner.popMode();
-				scanner.pushMode(ScanMode.BodyDeclare0);
+				scanner.pushMode(ScanMode.BodyDeclare1);
 				return 1;
 			case "procedure":
 				scanner.popMode();

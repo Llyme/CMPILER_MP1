@@ -139,6 +139,7 @@ public abstract class FunctionLogic {
 			IdentifierFunction target = new IdentifierFunction(
 				identifier,
 				false,
+				false,
 				returnType,
 				parameterTypes.toArray(params)
 			);
@@ -146,7 +147,17 @@ public abstract class FunctionLogic {
 			scanner.setTargetProcedure(target);
 			scanner.setBodyType(BodyType.Function);
 			scanner.popMode();
-			scanner.pushMode(ScanMode.BodyDeclare0);
+			scanner.pushMode(ScanMode.FunctionExit3, ScanMode.BodyDeclare0);
+			return 1;
+		case FunctionExit3:
+			if (!token_class.equals("semicolon")) {
+				scanner.print_error(3);
+				return 2;
+			}
+			
+			scanner.setTargetProcedure(null);
+			scanner.setBodyType(BodyType.Main);
+			scanner.popMode();
 			return 1;
 		default:
 			return 0;
