@@ -121,7 +121,16 @@ public abstract class BodyLogic {
 				scanner.pushMode(ScanMode.BodyAssignment1);
 				return 1;
 			case "integer":
-				if (scanner.getTargetIdentifier().getDataType() != "integer") {
+				if (!scanner.getTargetIdentifier().getDataType().equals("integer")) {
+					scanner.print_error(16);
+					return 2;
+				}
+
+				scanner.popMode();
+				scanner.pushMode(ScanMode.BodyAssignment1);
+				return 1;
+			case "real":
+				if (!scanner.getTargetIdentifier().getDataType().equals("real")) {
 					scanner.print_error(16);
 					return 2;
 				}
@@ -130,7 +139,10 @@ public abstract class BodyLogic {
 				scanner.pushMode(ScanMode.BodyAssignment1);
 				return 1;
 			case "open parenthesis":
-				if (scanner.getTargetIdentifier().getDataType() != "integer") {
+				String dataType = scanner.getTargetIdentifier().getDataType();
+				
+				if (!dataType.equals("integer") &&
+					!dataType.equals("real")) {
 					scanner.print_error(16);
 					return 2;
 				}
@@ -149,7 +161,9 @@ public abstract class BodyLogic {
 			// Expecting an operator.
 			switch (token_class) {
 			case "arithmetic operator":
-				if (scanner.getTargetIdentifier().getDataType() != "integer") {
+				String dataType = scanner.getTargetIdentifier().getDataType();
+				if (dataType != "integer" &&
+					dataType != "real") {
 					scanner.print_error(17);
 					return 2;
 				}
@@ -259,17 +273,7 @@ public abstract class BodyLogic {
 			return 2;
 		case BodyProcedure2:
 			// Expecting an identifier or literal.
-			
-			switch(token_class) {
-			case "identifier":
-			case "predeclared":
-			case "literal":
-				break;
-			default:
-				scanner.print_error(0);
-				return 2;
-			}
-			
+
 			IdentifierProcedure procedure2 = scanner.getTargetProcedure();
 			
 			if (!procedure2.hasVarargs() &&
@@ -280,13 +284,9 @@ public abstract class BodyLogic {
 			
 			String type = procedure2.getParameterType(procedureParameterIndex);
 			
-			if (token_class.equals("literal")) {
-				if (!type.isEmpty() && type != "string") {
-					scanner.print_error(16);
-					return 2;
-				}
-			}
-			else {
+			switch(token_class) {
+			case "identifier":
+			case "predeclared":
 				IIdentifier identifier = scanner.getIdentifier(lexeme);
 				
 				if (identifier == null) {
@@ -298,6 +298,32 @@ public abstract class BodyLogic {
 					scanner.print_error(16);
 					return 2;
 				}
+				
+				break;
+			case "literal":
+				if (!type.isEmpty() && type != "string") {
+					scanner.print_error(16);
+					return 2;
+				}
+				
+				break;
+			case "integer":
+				if (!type.isEmpty() && type != "integer") {
+					scanner.print_error(16);
+					return 2;
+				}
+				
+				break;
+			case "real":
+				if (!type.isEmpty() && type != "real") {
+					scanner.print_error(16);
+					return 2;
+				}
+				
+				break;
+			default:
+				scanner.print_error(0);
+				return 2;
 			}
 			
 			procedureParameterIndex++;

@@ -244,11 +244,47 @@ public class Scanner {
 	 */
 	public String get_lexeme(int start, String line) {
 		Boolean begin = false;
+		/**
+		 * Accepted Number Examples
+		 * 13, .5, -6, -.3, -3., -90.6, -0.0
+		 * 
+		 * 0 = Waiting for first character.
+		 * 1 = Whole number.
+		 * 2 = Has dot.
+		 * 3 = Not a number.
+		 */
+		int isNumberPrev = 0;
+		int isNumberCurr = 0;
 		Character literal = null;
 		int backslash = 0;
 		
 		for (int i = start; i < line.length(); i++) {
 			char c = line.charAt(i);
+			isNumberPrev = isNumberCurr;
+			
+			switch (isNumberCurr) {
+			case 0:
+				if (Character.isWhitespace(c))
+					break;
+				
+				if (c == '-' || Character.isDigit(c))
+					isNumberCurr = 1;
+				else if (c == '.')
+					isNumberCurr = 2;
+				else
+					isNumberCurr = 3;
+				break;
+			case 1:
+				if (c == '.')
+					isNumberCurr = 2;
+				else if (!Character.isDigit(c))
+					isNumberCurr = 3;
+				break;
+			case 2:
+				if (!Character.isDigit(c))
+					isNumberCurr = 3;
+				break;
+			}
 			
 			if (backslash > 0)
 				// End backslash mode after 1 character.
@@ -283,7 +319,7 @@ public class Scanner {
 					// Terminate lexeme.
 					return line.substring(start, i + 1);
 				} else
-					// Start literal mode with double quotation mark
+					// Start literal mode with the same character
 					// as terminating character.
 					literal = c;
 				
@@ -327,14 +363,22 @@ public class Scanner {
 				return line.substring(start, i);
 				
 			} else if (literal == null) {
+				if (isNumberPrev != 3 &&
+					isNumberPrev != 0 &&
+					isNumberCurr == 3) {
+					// The next character breaks the sequence
+					// for a number lexeme. Return it.
+					return line.substring(start, i);
+				}
+				
 				// Past this point is where non-literals are read.
 				if (c == ';' ||
 					c == ',' ||
 					c == '(' ||
 					c == ')' ||
-					c == '.')
+					(c == '.' && isNumberCurr == 3))
 					if (start == i)
-						// Just the separator.
+						// Return the separator only.
 						return line.substring(start, i + 1);
 					else
 						// A lexeme is behind this separator.
@@ -400,6 +444,9 @@ public class Scanner {
 		if (lexeme.matches("^-?[0-9]*$"))
 			return "integer";
 
+		if (lexeme.matches("^-?[0-9]*\\.?[0-9]*$"))
+			return "real";
+		
 		{
 			IIdentifier identifier = getIdentifier(lexeme);
 			
@@ -423,20 +470,22 @@ public class Scanner {
 	}*/
 	
 	public void print_error(int code) {
-		MainWindow.appendConsoleText(
+		String message =
 			"Error at line " + MainWindow.getLine() +
-			"; code " + code
-		);
+			"; error code #" + code;
 		
 		if (code >= 0 && code < Resources.error_codes.length)
-			MainWindow.appendConsoleText(Resources.error_codes[code]);
+			message += "; " + Resources.error_codes[code];
+
+		MainWindow.appendConsoleText(message);
 		
 		String log = "Mode";
 		
 		for (ScanMode mode : this.modes)
 			log += " -> " + mode;
-		
+
 		MainWindow.appendConsoleText(log);
+		MainWindow.appendConsoleText("");
 	}
 	
 	/**

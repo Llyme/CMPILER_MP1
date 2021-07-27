@@ -25,6 +25,7 @@ public class MainWindow {
 	private Text console_input;
 	private Label scanLine;
 	private Scanner scanner = new Scanner();
+	private String originalText = null;
 	private int line = 0;
 	
 	public static int getLine() {
@@ -33,6 +34,27 @@ public class MainWindow {
 	
 	public static String getEditorText() {
 		return self.editor.getText();
+	}
+	
+	public static void redrawEditorText() {
+		String[] lines = self.originalText.split("\\r?\\n");
+		int offset =
+			(int) Math.floor(Math.log10(lines.length));
+		
+		for (int i = 0; i < lines.length; i++) {
+			int n = i + 1;
+			int offset0 = (int) Math.floor(Math.log10(n));
+			String zeroes = "0".repeat(offset - offset0);
+			lines[i] = "[" + zeroes + n + "] " + lines[i];
+			
+			if (i == self.line - 1 ||
+				i == lines.length - 1 && self.line == -1)
+				lines[i] = ">" + lines[i];
+			else
+				lines[i] = " " + lines[i];
+		}
+		
+		self.editor.setText(String.join("\r\n", lines));
 	}
 	
 	public static void appendConsoleText(String text) {
@@ -126,6 +148,8 @@ public class MainWindow {
 				clearConsoleText();
 				setLine(0);
 				editor.setEditable(true);
+				editor.setText(originalText);
+				originalText = null;
 			}
 		});
 		
@@ -137,7 +161,10 @@ public class MainWindow {
 				if (line == -1)
 					return;
 				
-				String[] lines = getEditorText().split("\\r?\\n");
+				if (originalText == null)
+					self.originalText = getEditorText();
+				
+				String[] lines = originalText.split("\\r?\\n");
 				scanner.read_line(lines[line]);
 				
 				if (line == lines.length - 1)
@@ -146,6 +173,7 @@ public class MainWindow {
 					setLine(line + 1);
 
 				editor.setEditable(false);
+				redrawEditorText();
 			}
 		});
 		
@@ -156,6 +184,9 @@ public class MainWindow {
 			public void widgetSelected(SelectionEvent e) {
 				if (line == -1)
 					return;
+
+				if (originalText == null)
+					self.originalText = getEditorText();
 				
 				String[] lines = getEditorText().split("\\r?\\n");
 				
@@ -164,6 +195,7 @@ public class MainWindow {
 				
 				setLine(-1);
 				editor.setEditable(false);
+				redrawEditorText();
 			}
 		});
 		

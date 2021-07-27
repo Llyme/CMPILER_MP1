@@ -30,7 +30,8 @@ public abstract class ArithmeticLogic {
 				scanner.pushMode(ScanMode.Arithmetic1);
 				return 1;
 			case "integer":
-				if (scanner.getTargetIdentifier().getDataType() != "integer") {
+			case "real":
+				if (scanner.getTargetIdentifier().getDataType() != token_class) {
 					scanner.print_error(16);
 					return 2;
 				}
@@ -83,7 +84,8 @@ public abstract class ArithmeticLogic {
 				scanner.pushMode(ScanMode.ArithmeticGroup1);
 				return 1;
 			case "integer":
-				if (scanner.getTargetIdentifier().getDataType() != "integer") {
+			case "real":
+				if (scanner.getTargetIdentifier().getDataType() != token_class) {
 					scanner.print_error(16);
 					return 2;
 				}
