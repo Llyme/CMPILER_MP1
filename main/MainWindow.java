@@ -5,10 +5,12 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.layout.FillLayout;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.wb.swt.SWTResourceManager;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.SelectionEvent;
@@ -79,6 +81,28 @@ public class MainWindow {
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		// Get error descriptors.
+		
+		ArrayList<String> errors = new ArrayList<String>();
+		
+		try {
+			File file = new File(Resources.ERROR_FILENAME);
+			java.util.Scanner reader = new java.util.Scanner(file);
+			
+			while (reader.hasNextLine()) {
+				errors.add(reader.nextLine());
+			}
+			
+			reader.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		
+		Resources.error_codes = errors.toArray(Resources.error_codes);
+		
+		
+		// Draw window.
+		
 		try {
 			MainWindow window = new MainWindow();
 			window.open();
@@ -111,18 +135,6 @@ public class MainWindow {
 		shlScanner.setSize(800, 600);
 		shlScanner.setText("Scanner");
 		shlScanner.setLayout(new FillLayout(SWT.HORIZONTAL));
-		
-		Menu menu = new Menu(shlScanner, SWT.BAR);
-		shlScanner.setMenuBar(menu);
-		
-		MenuItem mntmFile = new MenuItem(menu, SWT.CASCADE);
-		mntmFile.setText("File");
-		
-		Menu fileMenu = new Menu(mntmFile);
-		mntmFile.setMenu(fileMenu);
-		
-		MenuItem fileOpen = new MenuItem(fileMenu, SWT.NONE);
-		fileOpen.setText("Open");
 		
 		SashForm sashForm = new SashForm(shlScanner, SWT.SMOOTH);
 		sashForm.setSashWidth(10);
@@ -161,8 +173,10 @@ public class MainWindow {
 				if (line == -1)
 					return;
 				
-				if (originalText == null)
+				if (originalText == null) {
 					self.originalText = getEditorText();
+					scanner.file_clear();
+				}
 				
 				String[] lines = originalText.split("\\r?\\n");
 				scanner.read_line(lines[line]);
@@ -185,8 +199,10 @@ public class MainWindow {
 				if (line == -1)
 					return;
 
-				if (originalText == null)
+				if (originalText == null) {
 					self.originalText = getEditorText();
+					scanner.file_clear();
+				}
 				
 				String[] lines = getEditorText().split("\\r?\\n");
 				

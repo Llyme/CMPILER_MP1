@@ -1,4 +1,10 @@
 package main;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Stack;
 
@@ -218,6 +224,7 @@ public class Scanner {
 			
 			String token_class = classify_lexeme(lexeme);
 			console_dump(lexeme, token_class);
+			file_dump(lexeme, token_class);
 			
 			if (parse(lexeme, token_class)) {
 				IdentifierProcedure target = getTargetProcedure();
@@ -465,9 +472,17 @@ public class Scanner {
 		return 0;
 	}
 	
-	/*public int file_dump(File outputFile, String lexeme, String token_class) {
+	public int file_dump(String lexeme, String token_class) {
+		try (FileWriter fw = new FileWriter(Resources.OUTPUT_FILENAME, true);
+			BufferedWriter bw = new BufferedWriter(fw);
+			PrintWriter out = new PrintWriter(bw)) {
+			out.println(lexeme + "	" + token_class);
+		} catch(IOException e) {
+			return -1;
+		}
 		
-	}*/
+		return 0;
+	}
 	
 	public void print_error(int code) {
 		String message =
@@ -486,6 +501,14 @@ public class Scanner {
 
 		MainWindow.appendConsoleText(log);
 		MainWindow.appendConsoleText("");
+	}
+	
+	public void file_clear() {
+		try {
+			Files.deleteIfExists(Paths.get(Resources.OUTPUT_FILENAME));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	/**
