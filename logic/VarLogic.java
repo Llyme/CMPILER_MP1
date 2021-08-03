@@ -20,7 +20,9 @@ public abstract class VarLogic {
 	
 	public static Chain array = Chain.create(
 			Resources.OPEN_BRACKET,
-			Resources.ARRAY_RANGE,
+			Resources.INTEGER,
+			Resources.DOUBLE_DOT,
+			Resources.INTEGER,
 			Resources.CLOSE_BRACKET,
 			Resources.OF,
 			Resources.DATA_TYPE,

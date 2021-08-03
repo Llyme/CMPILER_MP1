@@ -250,8 +250,13 @@ public class Scanner {
 	 * @return Lexeme.
 	 */
 	public String get_lexeme(int start, String line) {
-		Boolean began = false;
-		/***
+		/**
+		 * 0 = Not began;
+		 * 1 = Just Began;
+		 * 2 = Began;
+		 */
+		int began = 0;
+		/**
 		 * 0 = Not Initialized;
 		 * 1 = Not Special;
 		 * 2 = Special;
@@ -263,19 +268,42 @@ public class Scanner {
 		for (int i = start; i < line.length(); i++) {
 			char c = line.charAt(i);
 			
-			if (c == '.' && line.subSequence(start, i).equals("end"))
-				// Special case for dot separator.
-				return line.substring(start, i);
-			
 			if (backslash > 0)
 				// End backslash mode after 1 character.
 				backslash--;
 			
-			if (!began && Character.isWhitespace(c))
-				// Trim whitespace at the start.
-				continue;
-			else
-				began = true;
+			switch (began) {
+			case 0:
+				if (Character.isWhitespace(c))
+					// Trim whitespace at the start.
+					continue;
+				
+				began = 1;
+				break;
+				
+			case 1:
+				began = 2;
+			}
+			
+			if (c == '.') {
+				// Special cases for dot.
+				
+				if (line.substring(start, i).trim().equals("end"))
+					// As a separator.
+					return line.substring(start, i);
+				
+				
+				// As an array range.
+				
+				if (i - start >= 2 && line.charAt(i - 1) == '.') {
+					String result = line.substring(start, i - 1).trim();
+					
+					if (result.length() > 0)
+						return result;
+					
+				} else if (start == i - 1 && line.charAt(start) == '.')
+					return line.substring(start, i + 1);
+			}
 			
 			if (c == '\r') {
 				// Ignore carriage return.
@@ -299,6 +327,12 @@ public class Scanner {
 					
 					// Terminate lexeme.
 					return line.substring(start, i + 1);
+				} else if (i - start >= 1) {
+					// Started a literal when there are non-whitespace before it.
+					String result = line.substring(start, i).trim();
+					
+					if (result.length() > 0)
+						return result;
 				} else
 					// Start literal mode with the same character
 					// as terminating character.
@@ -410,6 +444,9 @@ public class Scanner {
 		
 		if (lexeme.equals("."))
 			return "dot";
+		
+		if (lexeme.equals(".."))
+			return "double dot";
 		
 		if (lexeme.equals("("))
 			return "open parenthesis";

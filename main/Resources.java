@@ -18,8 +18,8 @@ public final class Resources {
 	public static final Condition INTEGER =
 			(lexeme, token_class) -> token_class.equals("integer");
 
-	public static final Condition ARRAY_RANGE =
-			(lexeme, token_class) -> token_class.equals("array range");
+	public static final Condition DOUBLE_DOT =
+			(lexeme, token_class) -> token_class.equals("double dot");
 
 	public static final Condition OF =
 			(lexeme, token_class) -> lexeme.equals("of");
