@@ -8,4 +8,12 @@ public final class Helper {
 		
 		return false;
 	}
+	
+	/**
+	 * Create an array with the given varargs.
+	 */
+	@SafeVarargs
+	public static <T> T[] Array(T... items) {
+		return items;
+	}
 }

@@ -12,6 +12,9 @@ import java.util.ArrayList;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.SWTResourceManager;
+
+import logic.BodyLogic;
+
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Button;
@@ -81,6 +84,11 @@ public class MainWindow {
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		// Initialize logic sequence parsers.
+		
+		BodyLogic.initialize();
+		
+		
 		// Get error descriptors.
 		
 		ArrayList<String> errors = new ArrayList<String>();

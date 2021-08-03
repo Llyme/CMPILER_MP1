@@ -1,14 +1,67 @@
 package logic;
 
-import identifier.IdentifierInteger;
-import main.DeclarationType;
-import main.Helper;
-import main.Resources;
-import main.ScanMode;
-import main.Scanner;
+import identifier.*;
+import main.*;
 
 public abstract class VarLogic {
+	public static Chain init = Chain.create(
+			Resources.VAR
+	);
+		
+	public static Chain prefix = Chain.create(
+			Resources.IDENTIFIER,
+			Resources.COLON
+	);
+	
+	public static Chain data_type = Chain.create(
+			Resources.DATA_TYPE,
+			Resources.SEMICOLON
+	);
+	
+	public static Chain array = Chain.create(
+			Resources.OPEN_BRACKET,
+			Resources.ARRAY_RANGE,
+			Resources.CLOSE_BRACKET,
+			Resources.OF,
+			Resources.DATA_TYPE,
+			Resources.SEMICOLON
+	);
+	
+	private static Chain chain = null;
+	
+	public static void initialize() {
+		init.end(
+				prefix
+		);
+		
+		prefix.end(
+				data_type,
+				array
+		);
+		
+		data_type.end(
+				prefix
+				
+		);
+		
+		array.end(
+				prefix
+		);
+	}
+	
 	public static int parse(Scanner scanner, String lexeme, String token_class) {
+		if (chain != null) {
+			chain = chain.parse(lexeme, token_class);
+			
+			if (chain != null && chain.failed()) {
+				scanner.print_error(chain.errorCode());
+				return 2;
+			}
+			
+			if (chain != null)
+				return 1;
+		}
+		
 		if (lexeme.equals("var")) {
 			// var Token
 			
@@ -75,6 +128,13 @@ public abstract class VarLogic {
 			scanner.print_error(6);
 			return 2;
 		case VarExit0:
+			if (token_class.equals("open bracket")) {
+				chain = array;
+				scanner.popMode();
+				scanner.pushMode(ScanMode.VarExit2);
+				return 1;
+			}
+			
 			if (!Helper.contains(Resources.data_types, lexeme)) {
 				scanner.print_error(7);
 				return 2;
@@ -85,6 +145,16 @@ public abstract class VarLogic {
 				case "integer":
 					scanner.addIdentifier(new IdentifierInteger(name, false, 0));
 					break;
+				case "real":
+					scanner.addIdentifier(new IdentifierReal(name, false, 0));
+					break;
+				case "boolean":
+					scanner.addIdentifier(new IdentifierBoolean(name, false, false));
+					break;
+				case "character":
+					scanner.addIdentifier(new IdentifierCharacter(name, false, '\u0000'));
+				case "string":
+					scanner.addIdentifier(new IdentifierString(name, false, null));
 				}
 			}
 			

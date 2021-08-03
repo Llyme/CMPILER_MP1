@@ -250,64 +250,38 @@ public class Scanner {
 	 * @return Lexeme.
 	 */
 	public String get_lexeme(int start, String line) {
-		Boolean begin = false;
-		/**
-		 * Accepted Number Examples
-		 * 13, .5, -6, -.3, -3., -90.6, -0.0
-		 * 
-		 * 0 = Waiting for first character.
-		 * 1 = Whole number.
-		 * 2 = Has dot.
-		 * 3 = Not a number.
+		Boolean began = false;
+		/***
+		 * 0 = Not Initialized;
+		 * 1 = Not Special;
+		 * 2 = Special;
 		 */
-		int isNumberPrev = 0;
-		int isNumberCurr = 0;
+		int special = 0;
 		Character literal = null;
 		int backslash = 0;
 		
 		for (int i = start; i < line.length(); i++) {
 			char c = line.charAt(i);
-			isNumberPrev = isNumberCurr;
 			
-			switch (isNumberCurr) {
-			case 0:
-				if (Character.isWhitespace(c))
-					break;
-				
-				if (c == '-' || Character.isDigit(c))
-					isNumberCurr = 1;
-				else if (c == '.')
-					isNumberCurr = 2;
-				else
-					isNumberCurr = 3;
-				break;
-			case 1:
-				if (c == '.')
-					isNumberCurr = 2;
-				else if (!Character.isDigit(c))
-					isNumberCurr = 3;
-				break;
-			case 2:
-				if (!Character.isDigit(c))
-					isNumberCurr = 3;
-				break;
-			}
+			if (c == '.' && line.subSequence(start, i).equals("end"))
+				// Special case for dot separator.
+				return line.substring(start, i);
 			
 			if (backslash > 0)
 				// End backslash mode after 1 character.
 				backslash--;
 			
-			if (!begin && Character.isWhitespace(c))
+			if (!began && Character.isWhitespace(c))
 				// Trim whitespace at the start.
 				continue;
 			else
-				begin = true;
+				began = true;
 			
 			if (c == '\r') {
 				// Ignore carriage return.
 				continue;
 				
-			} else if (c == '"' || c == '\'' || c == '`') {
+			} else if (c == '\'') {
 				// Literal mode.
 				if (comment != null)
 					// In comment mode.
@@ -370,20 +344,17 @@ public class Scanner {
 				return line.substring(start, i);
 				
 			} else if (literal == null) {
-				if (isNumberPrev != 3 &&
-					isNumberPrev != 0 &&
-					isNumberCurr == 3) {
-					// The next character breaks the sequence
-					// for a number lexeme. Return it.
-					return line.substring(start, i);
-				}
-				
 				// Past this point is where non-literals are read.
+				if (special == 0)
+					if (Character.isLetterOrDigit(c) || c == '_' || c == '.')
+						special = 1;
+					else
+						special = 2;
+				
 				if (c == ';' ||
 					c == ',' ||
 					c == '(' ||
-					c == ')' ||
-					(c == '.' && isNumberCurr == 3))
+					c == ')')
 					if (start == i)
 						// Return the separator only.
 						return line.substring(start, i + 1);
@@ -394,6 +365,17 @@ public class Scanner {
 				if (Character.isWhitespace(c))
 					// Don't care about the whitespace. Discard it.
 					return line.substring(start, i + 1);
+				
+				switch (special) {
+				case 1:
+					if (!Character.isLetterOrDigit(c) && c != '_' && c != '.')
+						return line.substring(start, i);
+					break;
+				case 2:
+					if (Character.isLetterOrDigit(c) || c == '_' || c == '.')
+						return line.substring(start, i);
+					break;
+				}
 			}
 		}
 		
@@ -441,12 +423,23 @@ public class Scanner {
 		if (lexeme.equals(":="))
 			return "assignment";
 		
+		if (lexeme.equals("["))
+			return "open bracket";
+		
+		if (lexeme.equals("]"))
+			return "close bracket";
+		
 		if (lexeme.startsWith("{") && lexeme.endsWith("}"))
 			return "comment";
 		
-		if ((lexeme.startsWith("\"") && lexeme.endsWith("\"")) ||
-			(lexeme.startsWith("'") && lexeme.endsWith("'")))
-			return "literal";
+		if (lexeme.startsWith("'"))
+			if (lexeme.endsWith("'"))
+				return "literal";
+			else
+				return "broken literal";
+		
+		if (lexeme.matches("^-?[0-9]*\\.\\.-?[0-9]*$"))
+			return "array range";
 		
 		if (lexeme.matches("^-?[0-9]*$"))
 			return "integer";
@@ -461,7 +454,7 @@ public class Scanner {
 				return "predeclared";
 		}
 		
-		if (lexeme.matches("^[a-zA-Z0-9]*$"))
+		if (lexeme.matches("^[a-zA-Z0-9_]*$"))
 			return "identifier";
 		
 		return "unknown";

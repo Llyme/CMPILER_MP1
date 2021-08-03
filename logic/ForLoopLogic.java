@@ -6,8 +6,8 @@ import identifier.*;
 import main.*;
 
 public abstract class ForLoopLogic {
-	private static Stack<IIdentifier> counters = new Stack<IIdentifier>();
-	private static Stack<Integer> maximums = new Stack<Integer>();
+	//private static Stack<IIdentifier> counters = new Stack<IIdentifier>();
+	//private static Stack<Integer> maximums = new Stack<Integer>();
 	
 	public static int parse(Scanner scanner, String lexeme, String token_class) {
 		if (scanner.modeEmpty())
@@ -21,16 +21,16 @@ public abstract class ForLoopLogic {
 				return 2;
 			}
 			
-			IIdentifier counter = scanner.getIdentifier(lexeme);
+			/*IIdentifier counter = scanner.getIdentifier(lexeme);
 			
 			if (counter == null)
 				counter = new IdentifierInteger(
 					"lexeme",
 					false,
 					0
-				);
+				);*/
 			
-			counters.push(counter);
+			//counters.push(counter);
 			scanner.popMode();
 			scanner.pushMode(ScanMode.ForLoop1);
 			return 1;
@@ -48,12 +48,12 @@ public abstract class ForLoopLogic {
 			// Expecting integer.
 			switch (token_class) {
 			case "integer":
-				if (!counters.peek().isValid(lexeme)) {
+				/*if (!counters.peek().isValid(lexeme)) {
 					scanner.print_error(26);
 					return 2;
 				}
 				
-				counters.peek().setValue(lexeme);
+				counters.peek().setValue(lexeme);*/
 				scanner.popMode();
 				scanner.pushMode(ScanMode.ForLoop3);
 				return 1;
@@ -72,12 +72,16 @@ public abstract class ForLoopLogic {
 			return 1;
 		case ForLoop4:
 			// Expecting integer.
-			if (!token_class.equals("integer")) {
+			switch (token_class) {
+			case "integer":
+			case "identifier":
+				break;
+			default:
 				scanner.print_error(14);
 				return 2;
 			}
 			
-			maximums.push(Integer.parseInt(lexeme));
+			//maximums.push(Integer.parseInt(lexeme));
 			scanner.popMode();
 			scanner.pushMode(ScanMode.ForLoop5);
 			return 1;
@@ -107,8 +111,8 @@ public abstract class ForLoopLogic {
 				return 2;
 			}
 			
-			counters.pop();
-			maximums.pop();
+			//counters.pop();
+			//maximums.pop();
 			scanner.popMode();
 			return 1;
 		default:

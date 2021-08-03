@@ -32,15 +32,15 @@ public abstract class ExpressionLogic {
 			
 			switch (token_class) {
 			case "identifier":
-				IIdentifier identifier = scanner.getIdentifier(lexeme);
+				/*IIdentifier identifier = scanner.getIdentifier(lexeme);
 				
 				if (identifier == null) {
 					scanner.print_error(15);
 					return 2;
-				}
+				}*/
 				
 				if (not) {
-					if (identifier.getDataType() != "boolean") {
+					/*if (identifier.getDataType() != "boolean") {
 						scanner.print_error(16);
 						return 2;
 					}
@@ -49,10 +49,10 @@ public abstract class ExpressionLogic {
 						null,
 						false,
 						!(Boolean)identifier.getValue()
-					));
+					));*/
 					not = false;
-				} else
-					identifiers.push(identifier);
+				} /*else
+					identifiers.push(identifier);*/
 				
 				scanner.popMode();
 				scanner.pushMode(ScanMode.Expression1);
@@ -80,7 +80,11 @@ public abstract class ExpressionLogic {
 			// Expecting identifier.
 			switch (token_class) {
 			case "identifier":
-				IIdentifier identifier = scanner.getIdentifier(lexeme);
+			case "integer":
+			case "real":
+			case "predeclared":
+			case "string":
+				/*IIdentifier identifier = scanner.getIdentifier(lexeme);
 				
 				if (identifier == null) {
 					scanner.print_error(15);
@@ -90,10 +94,10 @@ public abstract class ExpressionLogic {
 				if (identifier.getDataType() != identifiers.peek().getDataType()) {
 					scanner.print_error(16);
 					return 2;
-				}
+				}*/
 				
 				// Do relation maths here.
-				identifiers.pop();
+				//identifiers.pop();
 				relations.pop();
 				scanner.popMode();
 				scanner.pushMode(ScanMode.Expression3);
