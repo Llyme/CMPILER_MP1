@@ -1,67 +1,185 @@
 package main;
 
 import java.util.HashMap;
+import node.*;
 
 public final class Resources {
-	public static final Condition IDENTIFIER =
-			(lexeme, token_class) -> token_class.equals("identifier");
-
-	public static final Condition COLON =
-			(lexeme, token_class) -> token_class.equals("colon");
-
-	public static final Condition OPEN_BRACKET =
-			(lexeme, token_class) -> token_class.equals("open bracket");
-
-	public static final Condition CLOSE_BRACKET =
-			(lexeme, token_class) -> token_class.equals("close bracket");
-
-	public static final Condition INTEGER =
-			(lexeme, token_class) -> token_class.equals("integer");
-
-	public static final Condition DOUBLE_DOT =
-			(lexeme, token_class) -> token_class.equals("double dot");
-
-	public static final Condition OF =
-			(lexeme, token_class) -> lexeme.equals("of");
-
-	public static final Condition DATA_TYPE =
-			(lexeme, token_class) -> Helper.contains(Resources.data_types, lexeme);
-
-	public static final Condition SEMICOLON =
-			(lexeme, token_class) -> token_class.equals("semicolon");
-
-	public static final Condition COMMA =
-			(lexeme, token_class) -> token_class.equals("comma");
-
-	public static final Condition VAR =
-			(lexeme, token_class) -> token_class.equals("var");
-
-	public static final Condition OPEN_PARENTHESIS =
-			(lexeme, token_class) -> token_class.equals("open parenthesis");
-
-	public static final Condition CLOSE_PARENTHESIS =
-			(lexeme, token_class) -> token_class.equals("close parenthesis");
+	public static final ConditionNode PROGRAM = new ConditionNode(
+			"Program",
+			(lexeme, token_class) -> lexeme.equals("program")
+		);
 	
-	public static final Condition RELATIONAL_VALUE =
+	public static final ConditionNode IDENTIFIER = new ConditionNode(
+			"Identifier",
+			(lexeme, token_class) -> token_class.equals("identifier")
+		);
+	
+	public static final ConditionNode PREDECLARED = new ConditionNode(
+			"Predeclared",
+			(lexeme, token_class) ->
+			token_class.equals("predeclared")
+		);
+
+	public static final ConditionNode COLON = new ConditionNode(
+			"Colon",
+			(lexeme, token_class) -> token_class.equals("colon")
+		);
+
+	public static final ConditionNode OPEN_BRACKET = new ConditionNode(
+			"Open Bracket",
+			(lexeme, token_class) -> token_class.equals("open bracket")
+		);
+
+	public static final ConditionNode CLOSE_BRACKET = new ConditionNode(
+			"Close Bracket",
+			(lexeme, token_class) -> token_class.equals("close bracket")
+		);
+
+	public static final ConditionNode INTEGER = new ConditionNode(
+			"Integer",
+			(lexeme, token_class) -> token_class.equals("integer")
+		);
+
+	public static final ConditionNode REAL = new ConditionNode(
+			"Real",
+			(lexeme, token_class) -> token_class.equals("real")
+		);
+
+	public static final ConditionNode DOT = new ConditionNode(
+			"Dot",
+			(lexeme, token_class) -> token_class.equals("dot")
+		);
+
+	public static final ConditionNode DOUBLE_DOT = new ConditionNode(
+			"Double Dot",
+			(lexeme, token_class) -> token_class.equals("double dot")
+		);
+
+	public static final ConditionNode OF = new ConditionNode(
+			"Of",
+			(lexeme, token_class) -> lexeme.equals("of")
+		);
+
+	public static final ConditionNode DATA_TYPE = new ConditionNode(
+			"Data Type",
+			(lexeme, token_class) -> Helper.contains(Resources.data_types, lexeme)
+		);
+
+	public static final ConditionNode SEMICOLON = new ConditionNode(
+			"Semicolon",
+			(lexeme, token_class) -> token_class.equals("semicolon")
+		);
+
+	public static final ConditionNode COMMA = new ConditionNode(
+			"Comma",
+			(lexeme, token_class) -> token_class.equals("comma")
+		);
+
+	public static final ConditionNode VAR = new ConditionNode(
+			"Var",
+			(lexeme, token_class) -> lexeme.equals("var")
+		);
+
+	public static final ConditionNode OPEN_PARENTHESIS = new ConditionNode(
+			"Open Parenthesis",
+			(lexeme, token_class) -> token_class.equals("open parenthesis")
+		);
+
+	public static final ConditionNode CLOSE_PARENTHESIS = new ConditionNode(
+			"Close Parenthesis",
+			(lexeme, token_class) -> token_class.equals("close parenthesis")
+		);
+	
+	public static final ConditionNode RELATIONAL_VALUE = new ConditionNode(
+			"Relational Value",
 			(lexeme, token_class) ->
 			token_class.equals("integer") ||
 			token_class.equals("real") ||
 			token_class.equals("identifier") ||
 			lexeme.equals("true") ||
-			lexeme.equals("false");
+			lexeme.equals("false")
+		);
 
-	public static final Condition RELATIONAL_OPERATOR =
-			(lexeme, token_class) -> token_class.equals("relational operator");
+	public static final ConditionNode RELATIONAL_OPERATOR = new ConditionNode(
+			"Relational Operator",
+			(lexeme, token_class) -> token_class.equals("relational operator")
+		);
 
-	public static final Condition BOOLEAN_OPERATOR =
-			(lexeme, token_class) -> Helper.contains(Resources.boolean_operators, lexeme);
+	public static final ConditionNode BOOLEAN_OPERATOR = new ConditionNode(
+			"Boolean Operator",
+			(lexeme, token_class) -> Helper.contains(Resources.boolean_operators, lexeme)
+		);
 
-	public static final Condition ASSIGNMENT =
-			(lexeme, token_class) -> token_class.equals("assignment");
+	public static final ConditionNode ARITHMETIC_OPERATOR = new ConditionNode(
+			"Arithmetic Operator",
+			(lexeme, token_class) -> Helper.contains(Resources.arithmetic_operators, lexeme)
+		);
 
-	public static final Condition NOT =
-			(lexeme, token_class) -> lexeme.equals("not");
-			
+	public static final ConditionNode ASSIGNMENT = new ConditionNode(
+			"Assignment",
+			(lexeme, token_class) -> token_class.equals("assignment")
+		);
+
+	public static final ConditionNode NOT = new ConditionNode(
+			"Not",
+			(lexeme, token_class) -> lexeme.equals("not")
+		);
+
+	public static final ConditionNode BEGIN = new ConditionNode(
+			"Begin",
+			(lexeme, token_class) -> lexeme.equals("begin")
+		);
+
+	public static final ConditionNode END = new ConditionNode(
+			"End",
+			(lexeme, token_class) -> lexeme.equals("end")
+		);
+
+	public static final ConditionNode IF = new ConditionNode(
+			"If",
+			(lexeme, token_class) -> lexeme.equals("if")
+		);
+
+	public static final ConditionNode THEN = new ConditionNode(
+			"Then",
+			(lexeme, token_class) -> lexeme.equals("then")
+		);
+
+	public static final ConditionNode ELSE = new ConditionNode(
+			"Else",
+			(lexeme, token_class) -> lexeme.equals("else")
+		);
+
+	public static final ConditionNode FOR = new ConditionNode(
+			"For",
+			(lexeme, token_class) -> lexeme.equals("for")
+		);
+
+	public static final ConditionNode TO = new ConditionNode(
+			"To",
+			(lexeme, token_class) -> lexeme.equals("to")
+		);
+
+	public static final ConditionNode DO = new ConditionNode(
+			"Do",
+			(lexeme, token_class) -> lexeme.equals("do")
+		);
+
+	public static final ConditionNode FUNCTION = new ConditionNode(
+			"Function",
+			(lexeme, token_class) -> lexeme.equals("function")
+		);
+
+	public static final ConditionNode CONST = new ConditionNode(
+			"Const",
+			(lexeme, token_class) -> lexeme.equals("const")
+		);
+
+	public static final ConditionNode PROCEDURE = new ConditionNode(
+			"Procedure",
+			(lexeme, token_class) -> lexeme.equals("procedure")
+		);
+	
 	public static String OUTPUT_FILENAME = "output.tok";
 	public static String ERROR_FILENAME = "error.txt";
 	
@@ -127,6 +245,6 @@ public final class Resources {
 	
 	public static String[] error_codes = new String[0];
 	
-	public static HashMap<Condition[], Integer> error_index =
-			new HashMap<Condition[], Integer>();
+	public static HashMap<String[], Integer> error_index =
+			new HashMap<String[], Integer>();
 }

@@ -10,6 +10,7 @@ import java.util.Stack;
 
 import identifier.*;
 import logic.*;
+import node.*;
 
 public class Scanner {
 	private ArrayList<IIdentifier> identifiers = new ArrayList<IIdentifier>();
@@ -20,9 +21,6 @@ public class Scanner {
 	private String comment = null;
 	private String programName = null;
 	private String currentLine = null;
-	public Stack<ScanMode> modes = new Stack<ScanMode>();
-	private DeclarationType declarationType = DeclarationType.Program;
-	private BodyType bodyType = BodyType.Main;
 	private Boolean waitingUserInput = false;
 	/**
 	 * The latest user input when `waitingUserInput` was enabled.
@@ -73,6 +71,7 @@ public class Scanner {
 		identifiers.add(new IdentifierFunction("readln", true, false, null, ""));
 		identifiers.add(new IdentifierProcedure("writeln", true, true, ""));
 		identifiers.add(new IdentifierType("string", true));
+		Parser.node = RootLogic.declare;
 	}
 	
 	public String getProgramName() {
@@ -81,49 +80,6 @@ public class Scanner {
 
 	public void setProgramName(String programName) {
 		this.programName = programName;
-	}
-	
-	public Boolean modeEmpty() {
-		return modes.empty();
-	}
-	
-	public ScanMode peekMode() {
-		return modes.peek();
-	}
-	
-	public ScanMode popMode() {
-		return modes.pop();
-	}
-	
-	/*public ScanMode popMode() {
-		ScanMode result = modes.pop();
-		String log = "Mode";
-		
-		for (ScanMode mode : modes)
-			log += " -> " + mode;
-		
-		MainWindow.appendConsoleText(log);
-		return result;
-	}*/
-	
-	public void pushMode(ScanMode... modes) {
-		for (ScanMode mode : modes)
-			this.modes.push(mode);
-
-		/*String log = "Mode";
-		
-		for (ScanMode mode : this.modes)
-			log += " -> " + mode;
-		
-		MainWindow.appendConsoleText(log);*/
-	}
-	
-	public DeclarationType getDeclarationType() {
-		return declarationType;
-	}
-	
-	public void setDeclarationType(DeclarationType type) {
-		declarationType = type;
 	}
 	
 	public IIdentifier getIdentifier(String name) {
@@ -148,14 +104,6 @@ public class Scanner {
 	
 	public void addIdentifier(IIdentifier identifier) {
 		identifiers.add(identifier);
-	}
-	
-	public void setBodyType(BodyType type) {
-		bodyType = type;
-	}
-	
-	public BodyType getBodyType() {
-		return bodyType;
 	}
 	
 	public Boolean getWaitingUserInput() {
@@ -225,8 +173,11 @@ public class Scanner {
 			String token_class = classify_lexeme(lexeme);
 			console_dump(lexeme, token_class);
 			file_dump(lexeme, token_class);
+			boolean flag = Parser.parse(lexeme, token_class);
+			log("[Result] " + flag);
+			log("");
 			
-			if (parse(lexeme, token_class)) {
+			if (flag) {
 				IdentifierProcedure target = getTargetProcedure();
 				
 				if (target != null)
@@ -236,6 +187,28 @@ public class Scanner {
 					else if (!token_class.equals("comment"))
 						// Exclude comments because they do nothing.
 						target.push(lexeme, token_class);
+			} else {
+				INode[] error_trace = Parser.getErrorTrace();
+				String[] flag0 = null;
+				
+				for (String[] keys : Resources.error_index.keySet()) {
+					if (error_trace.length != keys.length)
+						continue;
+					
+					for (int i = 0; i < keys.length; i++)
+						if (error_trace[i].getName().equals(keys[i])) {
+							flag0 = keys;
+							break;
+						}
+					
+					if (flag0 != null)
+						break;
+				}
+				
+				if (flag0 != null)
+					print_error(Resources.error_index.get(flag0));
+				else
+					print_error(Parser.getGenericErrorMessage());
 			}
 		}
 		
@@ -515,22 +488,19 @@ public class Scanner {
 	}
 	
 	public void print_error(int code) {
-		String message =
-			"Error at line " + MainWindow.getLine() +
-			"; error code #" + code;
+		String message = "error code #" + code;
 		
 		if (code >= 0 && code < Resources.error_codes.length)
 			message += "; " + Resources.error_codes[code];
 
-		MainWindow.appendConsoleText(message);
-		
-		String log = "Mode";
-		
-		for (ScanMode mode : this.modes)
-			log += " -> " + mode;
-
-		MainWindow.appendConsoleText(log);
-		MainWindow.appendConsoleText("");
+		print_error(message);
+	}
+	
+	public void print_error(String message) {
+		MainWindow.appendConsoleText(
+				"Error at line " + MainWindow.getLine() +
+				"; " + message
+		);
 	}
 	
 	public void file_clear() {
@@ -541,48 +511,10 @@ public class Scanner {
 		}
 	}
 	
-	/**
-	 * 0 = Skip;
-	 * 1 = Accepted;
-	 * 2 = Error;
-	 */
-	public Boolean parse(String lexeme, String token_class) {
-		if (token_class.equals("comment"))
-			// Comments are always ignored, regardless of where it was used.
-			return true;
+	public static void log(String text) {
+		if (!MainWindow.verboseLog())
+			return;
 		
-		int result;
-		
-		if ((result = GeneralLogic.parse(this, lexeme, token_class)) != 0)
-			return result == 1;
-		
-		if ((result = ProgramLogic.parse(this, lexeme, token_class)) != 0)
-			return result == 1;
-		
-		if ((result = VarLogic.parse(this, lexeme, token_class)) != 0)
-			return result == 1;
-		
-		if ((result = ProcedureLogic.parse(this, lexeme, token_class)) != 0)
-			return result == 1;
-		
-		if ((result = FunctionLogic.parse(this, lexeme, token_class)) != 0)
-			return result == 1;
-		
-		if ((result = BodyLogic.parse(this, lexeme, token_class)) != 0)
-			return result == 1;
-		
-		if ((result = ArithmeticLogic.parse(this, lexeme, token_class)) != 0)
-			return result == 1;
-		
-		if ((result = ForLoopLogic.parse(this, lexeme, token_class)) != 0)
-			return result == 1;
-		
-		if ((result = IfThenElseLogic.parse(this, lexeme, token_class)) != 0)
-			return result == 1;
-		
-		if ((result = ExpressionLogic.parse(this, lexeme, token_class)) != 0)
-			return result == 1;
-		
-		return false;
+		MainWindow.appendConsoleText(text);
 	}
 }

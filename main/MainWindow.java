@@ -13,7 +13,14 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.SWTResourceManager;
 
+import logic.ArithmeticLogic;
 import logic.BodyLogic;
+import logic.ForLoopLogic;
+import logic.FunctionLogic;
+import logic.IfThenElseLogic;
+import logic.ProcedureLogic;
+import logic.RootLogic;
+import logic.VarLogic;
 
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.SelectionEvent;
@@ -29,6 +36,8 @@ public class MainWindow {
 	private Text console;
 	private Text console_input;
 	private Label scanLine;
+	private Button verboseLog;
+	
 	private Scanner scanner = new Scanner();
 	private String originalText = null;
 	private int line = 0;
@@ -39,6 +48,10 @@ public class MainWindow {
 	
 	public static String getEditorText() {
 		return self.editor.getText();
+	}
+	
+	public static boolean verboseLog() {
+		return self.verboseLog.getSelection();
 	}
 	
 	public static void redrawEditorText() {
@@ -86,7 +99,14 @@ public class MainWindow {
 	public static void main(String[] args) {
 		// Initialize logic sequence parsers.
 		
+		RootLogic.initialize();
 		BodyLogic.initialize();
+		ArithmeticLogic.initialize();
+		ForLoopLogic.initialize();
+		FunctionLogic.initialize();
+		IfThenElseLogic.initialize();
+		ProcedureLogic.initialize();
+		VarLogic.initialize();
 		
 		
 		// Get error descriptors.
@@ -168,7 +188,10 @@ public class MainWindow {
 				clearConsoleText();
 				setLine(0);
 				editor.setEditable(true);
-				editor.setText(originalText);
+				
+				if (originalText != null)
+					editor.setText(originalText);
+				
 				originalText = null;
 			}
 		});
@@ -201,6 +224,10 @@ public class MainWindow {
 		
 		Button scanAll = new Button(sashForm_4, SWT.NONE);
 		scanAll.setText("Scan All");
+		
+		verboseLog = new Button(sashForm_4, SWT.CHECK);
+		verboseLog.setText("Verbose Log");
+		
 		scanAll.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -224,7 +251,7 @@ public class MainWindow {
 		});
 		
 		
-		sashForm_4.setWeights(new int[] {1, 1, 1});
+		sashForm_4.setWeights(new int[] {1, 1, 1, 1});
 		sashForm_3.setWeights(new int[] {552, 24, 24});
 		
 		SashForm sashForm_1 = new SashForm(sashForm, SWT.SMOOTH | SWT.VERTICAL);
