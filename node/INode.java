@@ -8,6 +8,10 @@ public interface INode {
 		return new StackNode(name, nodes);
 	}
 	
+	public static StackNode stack(INode...nodes) {
+		return new StackNode("", nodes);
+	}
+	
 	public static INode[] array(INode...nodes) {
 		return nodes;
 	}

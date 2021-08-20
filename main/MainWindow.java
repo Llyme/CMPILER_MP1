@@ -13,14 +13,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.SWTResourceManager;
 
-import logic.ArithmeticLogic;
-import logic.BodyLogic;
-import logic.ForLoopLogic;
-import logic.FunctionLogic;
-import logic.IfThenElseLogic;
-import logic.ProcedureLogic;
-import logic.RootLogic;
-import logic.VarLogic;
+import logic.*;
 
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.SelectionEvent;
@@ -107,6 +100,8 @@ public class MainWindow {
 		IfThenElseLogic.initialize();
 		ProcedureLogic.initialize();
 		VarLogic.initialize();
+		BooleanExpressionLogic.initialize();
+		AssignmentLogic.initialize();
 		
 		
 		// Get error descriptors.

@@ -444,9 +444,9 @@ public class Scanner {
 		
 		if (lexeme.startsWith("'"))
 			if (lexeme.endsWith("'"))
-				return "literal";
+				return "string";
 			else
-				return "broken literal";
+				return "broken string";
 		
 		if (lexeme.matches("^-?[0-9]*\\.\\.-?[0-9]*$"))
 			return "array range";

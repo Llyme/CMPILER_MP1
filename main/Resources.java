@@ -45,6 +45,18 @@ public final class Resources {
 			(lexeme, token_class) -> token_class.equals("real")
 		);
 
+	public static final ConditionNode STRING = new ConditionNode(
+			"String",
+			(lexeme, token_class) -> token_class.equals("string")
+		);
+
+	public static final ConditionNode BOOLEAN = new ConditionNode(
+			"Boolean",
+			(lexeme, token_class) ->
+			lexeme.equals("true") ||
+			lexeme.equals("false")
+		);
+
 	public static final ConditionNode DOT = new ConditionNode(
 			"Dot",
 			(lexeme, token_class) -> token_class.equals("dot")
@@ -89,16 +101,6 @@ public final class Resources {
 			"Close Parenthesis",
 			(lexeme, token_class) -> token_class.equals("close parenthesis")
 		);
-	
-	public static final ConditionNode RELATIONAL_VALUE = new ConditionNode(
-			"Relational Value",
-			(lexeme, token_class) ->
-			token_class.equals("integer") ||
-			token_class.equals("real") ||
-			token_class.equals("identifier") ||
-			lexeme.equals("true") ||
-			lexeme.equals("false")
-		);
 
 	public static final ConditionNode RELATIONAL_OPERATOR = new ConditionNode(
 			"Relational Operator",
@@ -110,6 +112,13 @@ public final class Resources {
 			(lexeme, token_class) -> Helper.contains(Resources.boolean_operators, lexeme)
 		);
 
+	public static final ConditionNode BOOLEAN_CONDITIONAL_OPERATOR = new ConditionNode(
+			"Boolean Conditional Operator",
+			(lexeme, token_class) ->
+			lexeme.equals("and") ||
+			lexeme.equals("or")
+		);
+	
 	public static final ConditionNode ARITHMETIC_OPERATOR = new ConditionNode(
 			"Arithmetic Operator",
 			(lexeme, token_class) -> Helper.contains(Resources.arithmetic_operators, lexeme)

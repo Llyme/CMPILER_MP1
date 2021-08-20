@@ -15,7 +15,7 @@ public abstract class IfThenElseLogic {
 				"IfThenElse.Declare",
 				Resources.IF,
 				Resources.OPEN_PARENTHESIS,
-				BodyLogic.expression,
+				BooleanExpressionLogic.declare,
 				Resources.CLOSE_PARENTHESIS,
 				Resources.THEN,
 				new OrNode(body, BodyLogic.content)

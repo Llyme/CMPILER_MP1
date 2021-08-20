@@ -10,11 +10,11 @@ public abstract class ForLoopLogic {
 		declare.set(() -> INode.stack(
 				"ForLoop.Declare",
 				Resources.FOR,
-				new OrNode(Resources.IDENTIFIER, Resources.PREDECLARED),
+				Resources.IDENTIFIER,
 				Resources.ASSIGNMENT,
-				Resources.INTEGER,
+				new OrNode(Resources.INTEGER, Resources.IDENTIFIER),
 				Resources.TO,
-				Resources.INTEGER,
+				new OrNode(Resources.INTEGER, Resources.IDENTIFIER),
 				Resources.DO,
 				new OrNode(BodyLogic.declare_semicolon, BodyLogic.content)
 		));

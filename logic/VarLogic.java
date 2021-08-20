@@ -6,31 +6,44 @@ import node.*;
 public abstract class VarLogic {
 	public static final PackageNode declare = new PackageNode();
 	
-	public static final PackageNode identifier = new PackageNode();
-	public static final PackageNode identifier_append = new PackageNode();
+	public static final PackageNode content = new PackageNode();
+	public static final PackageNode content_append = new PackageNode();
+	
+	public static final PackageNode array = new PackageNode();
 	
 	public static void initialize() {
 		declare.set(() -> INode.stack(
 				"Var.Declare",
 				Resources.VAR,
-				identifier
+				content
 		));
 		
-		identifier.set(() -> INode.stack(
-				"Var.Identifier",
+		content.set(() -> INode.stack(
+				"Var.Content",
 				Resources.IDENTIFIER,
-				new OrNode(identifier_append, null),
+				new OrNode(content_append, null),
 				Resources.COLON,
-				Resources.DATA_TYPE,
+				new OrNode(array, Resources.DATA_TYPE),
 				Resources.SEMICOLON,
-				new OrNode(identifier, null)
+				new OrNode(content, null)
 		));
 		
-		identifier_append.set(() -> INode.stack(
-				"Var.Identifier.Append",
+		content_append.set(() -> INode.stack(
+				"Var.Content.Append",
 				Resources.COMMA,
 				Resources.IDENTIFIER,
-				new OrNode(identifier_append, null)
+				new OrNode(content_append, null)
+		));
+		
+		array.set(() -> INode.stack(
+				"Var.Array",
+				Resources.OPEN_BRACKET,
+				Resources.INTEGER,
+				Resources.DOUBLE_DOT,
+				Resources.INTEGER,
+				Resources.CLOSE_BRACKET,
+				Resources.OF,
+				Resources.DATA_TYPE
 		));
 	}
 }
