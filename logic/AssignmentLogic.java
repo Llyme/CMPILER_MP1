@@ -191,7 +191,7 @@ public abstract class AssignmentLogic {
 								NOT,
 								new OrNode(
 										Resources.BOOLEAN,
-										Resources.IDENTIFIER
+										GenericLogic.IDENTIFIER_OR_CALLABLE
 								)
 						),
 						BOOLEAN
@@ -213,7 +213,7 @@ public abstract class AssignmentLogic {
 		
 		content_identifier.set(() -> INode.stack(
 				"Assignment.Content.String",
-				Resources.IDENTIFIER,
+				GenericLogic.IDENTIFIER_OR_CALLABLE,
 				new OrNode(
 						arithmetic_integer,
 						arithmetic_real,
@@ -229,14 +229,14 @@ public abstract class AssignmentLogic {
 		arithmetic_integer.set(() -> INode.stack(
 				"Assignment.Arithmetic.Integer",
 				ARITHMETIC_OPERATOR,
-				new OrNode(Resources.INTEGER, Resources.IDENTIFIER, ArithmeticLogic.group_integer),
+				new OrNode(Resources.INTEGER, GenericLogic.IDENTIFIER_OR_CALLABLE, ArithmeticLogic.group_integer),
 				new OrNode(ArithmeticLogic.content_integer, null)
 		));
 		
 		arithmetic_real.set(() -> INode.stack(
 				"Assignment.Arithmetic.Real",
 				ARITHMETIC_OPERATOR,
-				new OrNode(Resources.REAL, Resources.IDENTIFIER, ArithmeticLogic.group_real),
+				new OrNode(Resources.REAL, GenericLogic.IDENTIFIER_OR_CALLABLE, ArithmeticLogic.group_real),
 				new OrNode(ArithmeticLogic.content_real, null)
 		));
 		
@@ -245,7 +245,7 @@ public abstract class AssignmentLogic {
 				RELATIONAL_OPERATOR,
 				new OrNode(
 						Resources.INTEGER,
-						Resources.IDENTIFIER
+						GenericLogic.IDENTIFIER_OR_CALLABLE
 				),
 				new OrNode(
 						ArithmeticLogic.content_integer,
@@ -262,7 +262,7 @@ public abstract class AssignmentLogic {
 				RELATIONAL_OPERATOR,
 				new OrNode(
 						Resources.REAL,
-						Resources.IDENTIFIER
+						GenericLogic.IDENTIFIER_OR_CALLABLE
 				),
 				new OrNode(
 						ArithmeticLogic.content_real,
@@ -280,7 +280,7 @@ public abstract class AssignmentLogic {
 				new OrNode(
 						BooleanExpressionLogic.negation,
 						Resources.BOOLEAN,
-						Resources.IDENTIFIER
+						GenericLogic.IDENTIFIER_OR_CALLABLE
 				),
 				new OrNode(
 						BooleanExpressionLogic.conditional_operator,
@@ -293,7 +293,7 @@ public abstract class AssignmentLogic {
 				RELATIONAL_OPERATOR,
 				new OrNode(
 						Resources.STRING,
-						Resources.IDENTIFIER
+						GenericLogic.IDENTIFIER_OR_CALLABLE
 				),
 				new OrNode(
 						BooleanExpressionLogic.conditional_operator,
@@ -309,7 +309,7 @@ public abstract class AssignmentLogic {
 						Resources.REAL,
 						Resources.BOOLEAN,
 						Resources.STRING,
-						Resources.IDENTIFIER
+						GenericLogic.IDENTIFIER_OR_CALLABLE
 				),
 				new OrNode(
 						BooleanExpressionLogic.conditional_operator,

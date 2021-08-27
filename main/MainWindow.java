@@ -102,6 +102,7 @@ public class MainWindow {
 		VarLogic.initialize();
 		BooleanExpressionLogic.initialize();
 		AssignmentLogic.initialize();
+		GenericLogic.initialize();
 		
 		
 		// Get error descriptors.

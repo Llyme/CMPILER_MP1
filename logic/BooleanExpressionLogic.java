@@ -29,7 +29,7 @@ public abstract class BooleanExpressionLogic {
 						INode.stack(ArithmeticLogic.declare_real, declare_real),
 						INode.stack(Resources.STRING, declare_string),
 						INode.stack(Resources.BOOLEAN, declare_boolean),
-						INode.stack(Resources.IDENTIFIER, declare_identifier)
+						INode.stack(GenericLogic.IDENTIFIER_OR_CALLABLE, declare_identifier)
 				)
 		));
 		
@@ -38,7 +38,7 @@ public abstract class BooleanExpressionLogic {
 				Resources.RELATIONAL_OPERATOR,
 				new OrNode(
 						Resources.INTEGER,
-						Resources.IDENTIFIER
+						GenericLogic.IDENTIFIER_OR_CALLABLE
 				),
 				new OrNode(
 						ArithmeticLogic.content_integer,
@@ -52,7 +52,7 @@ public abstract class BooleanExpressionLogic {
 				Resources.RELATIONAL_OPERATOR,
 				new OrNode(
 						Resources.REAL,
-						Resources.IDENTIFIER
+						GenericLogic.IDENTIFIER_OR_CALLABLE
 				),
 				new OrNode(
 						ArithmeticLogic.content_real,
@@ -66,7 +66,7 @@ public abstract class BooleanExpressionLogic {
 				Resources.RELATIONAL_OPERATOR,
 				new OrNode(
 						Resources.STRING,
-						Resources.IDENTIFIER
+						GenericLogic.IDENTIFIER_OR_CALLABLE
 				),
 				new OrNode(conditional_operator, null)
 		));
@@ -79,7 +79,7 @@ public abstract class BooleanExpressionLogic {
 								new OrNode(
 										negation,
 										Resources.BOOLEAN,
-										Resources.IDENTIFIER
+										GenericLogic.IDENTIFIER_OR_CALLABLE
 								)
 						),
 						null
@@ -95,7 +95,7 @@ public abstract class BooleanExpressionLogic {
 						Resources.REAL,
 						Resources.STRING,
 						Resources.BOOLEAN,
-						Resources.IDENTIFIER,
+						GenericLogic.IDENTIFIER_OR_CALLABLE,
 						negation,
 						group
 				),

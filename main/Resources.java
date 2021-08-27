@@ -221,35 +221,44 @@ public final class Resources {
 	};
 	
 	public static String[] arithmetic_operators = new String[] {
-		"+",
-		"-",
-		"/",
-		"*",
-		"mod"
+			"+",
+			"-",
+			"/",
+			"*",
+			"mod"
 	};
 	
 	public static String[] relational_operators = new String[] {
-		"=",
-		"<>",
-		"<",
-		">",
-		"<=",
-		">="
+			"=",
+			"<>",
+			"<",
+			">",
+			"<=",
+			">="
 	};
 	
 	public static String[] boolean_operators = new String[] {
-		"and",
-		"or",
-		"not"
+			"and",
+			"or",
+			"not"
 	};
 	
 	public static String[] data_types = new String[] {
-		"character",
-		"string",
-		"integer",
-		"real",
-		"boolean",
-		"array"
+			"character",
+			"string",
+			"integer",
+			"real",
+			"boolean",
+			"array"
+	};
+	
+	public static char[] special_characters = new char[] {
+			';',
+			',',
+			'(',
+			')',
+			'[',
+			']'
 	};
 	
 	public static String[] error_codes = new String[0];

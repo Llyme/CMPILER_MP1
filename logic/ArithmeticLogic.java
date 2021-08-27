@@ -23,7 +23,7 @@ public abstract class ArithmeticLogic {
 						declare_integer,
 						declare_real,
 						INode.stack(
-								Resources.IDENTIFIER,
+								GenericLogic.IDENTIFIER_OR_CALLABLE,
 								new OrNode(content, null)
 						),
 						group
@@ -43,7 +43,7 @@ public abstract class ArithmeticLogic {
 								new OrNode(content_real, null)
 						),
 						INode.stack(
-								Resources.IDENTIFIER,
+								GenericLogic.IDENTIFIER_OR_CALLABLE,
 								new OrNode(content, null)
 						),
 						group
@@ -67,7 +67,11 @@ public abstract class ArithmeticLogic {
 		content_integer.set(() -> INode.stack(
 				"Arithmetic.Content.Integer",
 				Resources.ARITHMETIC_OPERATOR,
-				new OrNode(Resources.INTEGER, Resources.IDENTIFIER, group_integer),
+				new OrNode(
+						Resources.INTEGER,
+						GenericLogic.IDENTIFIER_OR_CALLABLE,
+						group_integer
+				),
 				new OrNode(content_integer, null)
 		));
 		
@@ -88,7 +92,11 @@ public abstract class ArithmeticLogic {
 		content_real.set(() -> INode.stack(
 				"Arithmetic.Content.Real",
 				Resources.ARITHMETIC_OPERATOR,
-				new OrNode(Resources.REAL, Resources.IDENTIFIER, group_real),
+				new OrNode(
+						Resources.REAL,
+						GenericLogic.IDENTIFIER_OR_CALLABLE,
+						group_real
+				),
 				new OrNode(content_real, null)
 		));
 		

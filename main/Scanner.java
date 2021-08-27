@@ -229,14 +229,9 @@ public class Scanner {
 		 * 2 = Began;
 		 */
 		int began = 0;
-		/**
-		 * 0 = Not Initialized;
-		 * 1 = Not Special;
-		 * 2 = Special;
-		 */
-		int special = 0;
 		Character literal = null;
 		int backslash = 0;
+		boolean dot = false;
 		
 		for (int i = start; i < line.length(); i++) {
 			char c = line.charAt(i);
@@ -256,26 +251,6 @@ public class Scanner {
 				
 			case 1:
 				began = 2;
-			}
-			
-			if (c == '.') {
-				// Special cases for dot.
-				
-				if (line.substring(start, i).trim().equals("end"))
-					// As a separator.
-					return line.substring(start, i);
-				
-				
-				// As an array range.
-				
-				if (i - start >= 2 && line.charAt(i - 1) == '.') {
-					String result = line.substring(start, i - 1).trim();
-					
-					if (result.length() > 0)
-						return result;
-					
-				} else if (start == i - 1 && line.charAt(start) == '.')
-					return line.substring(start, i + 1);
 			}
 			
 			if (c == '\r') {
@@ -352,42 +327,70 @@ public class Scanner {
 				
 			} else if (literal == null) {
 				// Past this point is where non-literals are read.
-				if (special == 0)
-					if (Character.isLetterOrDigit(c) || c == '_' || c == '.')
-						special = 1;
-					else
-						special = 2;
 				
-				if (c == ';' ||
-					c == ',' ||
-					c == '(' ||
-					c == ')')
-					if (start == i)
-						// Return the separator only.
+				if (c == '.') {
+					// Special cases for dot.
+					
+					if (dot) {
+						if (line.charAt(i - 1) == '.') {
+							// Double dot.
+							
+							if (i - start > 1) {
+								// There is a lexeme behind the double dot. Return that first.
+								return line.substring(start, i - 1);
+							}
+							
+							// Return the double dot.
+							return line.substring(start, i + 1);
+						}
+						
+						// Dot acts as a separator.
+						return line.substring(start, i - 1);
+					}
+					
+					dot = true;
+					
+					if (i == start)
+						// Just started. Wait for any leading characters.
+						continue;
+
+					if (line.substring(start, i).trim().matches(".*[^0-9].*"))
+						// There are non-digits in the capture. Return without the dot.
+						return line.substring(start, i);
+					
+				} else {
+					// Non-dot characters.
+					
+					if (Character.isWhitespace(c)) {
+						// Don't care about the whitespace. Discard it.
 						return line.substring(start, i + 1);
-					else
-						// A lexeme is behind this separator.
-						return line.substring(start, i);
-				
-				if (Character.isWhitespace(c))
-					// Don't care about the whitespace. Discard it.
-					return line.substring(start, i + 1);
-				
-				switch (special) {
-				case 1:
-					if (!Character.isLetterOrDigit(c) && c != '_' && c != '.')
-						return line.substring(start, i);
-					break;
-				case 2:
-					if (Character.isLetterOrDigit(c) || c == '_' || c == '.')
-						return line.substring(start, i);
-					break;
+					
+					} else if (Character.isDigit(c)) {
+						// No problems involved with digits.
+						continue;
+						
+					} else if (Character.isLetterOrDigit(c) || c == '_') {
+						// Possible characters for identifiers.
+						
+						if (dot)
+							// A dot was previously read. Return everything besides this character.
+							return line.substring(start, i);
+						
+					} else if (Helper.contains(Resources.special_characters, c)) {
+						// Special characters like semicolon, comma, parenthesis, and brackets.
+						if (start == i)
+							// Return the character only.
+							return line.substring(start, i + 1);
+						else
+							// A lexeme is behind this character.
+							return line.substring(start, i);
+					}
 				}
 			}
 		}
 		
 		if (comment != null)
-			return comment += line.substring(start) + "\n";
+			return comment += line.substring(start) + "\r\n";
 		
 		// Return the line if no terminating characters were found.
 		return line.substring(start);

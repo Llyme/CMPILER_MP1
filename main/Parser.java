@@ -160,13 +160,23 @@ public class Parser {
 				return false;
 			}
 			
-			boolean flag = parse_internal(
-					lexeme,
-					token_class,
-					stack.nodes.pop(),
-					stack,
-					0
-			);
+			boolean flag = false;
+			
+			while (stack.nodes.size() > 0) {
+				INode node0 = stack.nodes.pop();
+				flag = parse_internal(
+						lexeme,
+						token_class,
+						node0,
+						stack,
+						0
+				);
+				
+				if (flag ||
+					!(node0 instanceof StackNode stack0) ||
+					stack0.nodes.size() > 0)
+					break;
+			}
 			
 			if (parent != null &&
 				parent instanceof StackNode stack0) {
