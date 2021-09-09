@@ -36,6 +36,7 @@ public abstract class BodyLogic {
 				new OrNode(
 						ForLoopLogic.declare,
 						IfThenElseLogic.declare,
+						WhileLoopLogic.declare,
 						identifier
 				)
 		));

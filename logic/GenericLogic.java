@@ -5,6 +5,7 @@ import node.*;
 
 public abstract class GenericLogic {
 	public static final PackageNode IDENTIFIER_OR_CALLABLE = new PackageNode();
+	public static final PackageNode NUMBER = new PackageNode();
 	
 	public static void initialize() {
 		IDENTIFIER_OR_CALLABLE.set(() -> INode.stack(
@@ -20,6 +21,13 @@ public abstract class GenericLogic {
 								Resources.CLOSE_PARENTHESIS
 						),
 						null
+				)
+		));
+		NUMBER.set(() -> INode.stack(
+				"Number",
+				new OrNode(
+						Resources.INTEGER,
+					Resources.REAL
 				)
 		));
 	}

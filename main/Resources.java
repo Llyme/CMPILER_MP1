@@ -4,6 +4,13 @@ import java.util.HashMap;
 import node.*;
 
 public final class Resources {
+	public static final String OUTPUT_FILENAME = "output.tok";
+	public static final String ERROR_FILENAME = "error.txt";
+	
+	
+	public static final String REGEX_REAL = "^-?[0-9]*\\.?[0-9]*$";
+	
+	
 	public static final ConditionNode PROGRAM = new ConditionNode(
 			"Program",
 			(lexeme, token_class) -> lexeme.equals("program")
@@ -188,11 +195,14 @@ public final class Resources {
 			"Procedure",
 			(lexeme, token_class) -> lexeme.equals("procedure")
 		);
+
+	public static final ConditionNode WHILE = new ConditionNode(
+			"While",
+			(lexeme, token_class) -> lexeme.equals("while")
+		);
 	
-	public static String OUTPUT_FILENAME = "output.tok";
-	public static String ERROR_FILENAME = "error.txt";
 	
-	public static String[] reserved = new String[] {
+	public static final String[] reserved = new String[] {
 			"program",
 			"and",
 			"array",
@@ -220,7 +230,7 @@ public final class Resources {
 			"return"
 	};
 	
-	public static String[] arithmetic_operators = new String[] {
+	public static final String[] arithmetic_operators = new String[] {
 			"+",
 			"-",
 			"/",
@@ -228,7 +238,7 @@ public final class Resources {
 			"mod"
 	};
 	
-	public static String[] relational_operators = new String[] {
+	public static final String[] relational_operators = new String[] {
 			"=",
 			"<>",
 			"<",
@@ -237,13 +247,13 @@ public final class Resources {
 			">="
 	};
 	
-	public static String[] boolean_operators = new String[] {
+	public static final String[] boolean_operators = new String[] {
 			"and",
 			"or",
 			"not"
 	};
 	
-	public static String[] data_types = new String[] {
+	public static final String[] data_types = new String[] {
 			"character",
 			"string",
 			"integer",
@@ -252,7 +262,7 @@ public final class Resources {
 			"array"
 	};
 	
-	public static char[] special_characters = new char[] {
+	public static final char[] special_characters = new char[] {
 			';',
 			',',
 			'(',

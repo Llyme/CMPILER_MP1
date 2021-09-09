@@ -33,20 +33,20 @@ public class Parser {
 		String result = "Expected ";
 		
 		if (error_trace.size() == 1)
-			return result + error_trace.get(0).getName() + "!";
+			return result + "`" + error_trace.get(0).getName() + "`" + "!";
 		
 		if (error_trace.size() == 2)
 			return result +
-				error_trace.get(0).getName() + " or " +
-				error_trace.get(1).getName() + "!";
+				"`" + error_trace.get(0).getName() + "` or " +
+				"`" + error_trace.get(1).getName() + "`!";
 		
 		for (int i = 0; i < error_trace.size(); i++) {
 			INode node = error_trace.get(i);
 			
 			if (i != error_trace.size() - 1)
-				result += node.getName() + ", ";
+				result += "`" + node.getName() + "`, ";
 			else
-				result += "or " + node.getName() + "!";
+				result += "or `" + node.getName() + "`!";
 		}
 		
 		return result;
@@ -79,7 +79,8 @@ public class Parser {
 			for (INode node0 : or.nodes)
 				appendErrorTrace(node0);
 		
-		else if (node instanceof ConditionNode condition)
+		else if (node instanceof ConditionNode condition &&
+				!error_trace.contains(condition))
 			error_trace.add(condition);
 	}
 	

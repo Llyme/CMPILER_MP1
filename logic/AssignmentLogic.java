@@ -9,26 +9,22 @@ public abstract class AssignmentLogic {
 	public static final PackageNode group = new PackageNode();
 	
 	public static final PackageNode content = new PackageNode();
-	public static final PackageNode content_integer = new PackageNode();
-	public static final PackageNode content_real = new PackageNode();
+	public static final PackageNode content_number = new PackageNode();
 	public static final PackageNode content_boolean = new PackageNode();
 	public static final PackageNode content_string = new PackageNode();
 	public static final PackageNode content_identifier = new PackageNode();
 
-	public static final PackageNode arithmetic_integer = new PackageNode();
-	public static final PackageNode arithmetic_real = new PackageNode();
+	public static final PackageNode arithmetic_number = new PackageNode();
 	
-	public static final PackageNode relational_integer = new PackageNode();
-	public static final PackageNode relational_real = new PackageNode();
+	public static final PackageNode relational_number = new PackageNode();
 	public static final PackageNode relational_boolean = new PackageNode();
 	public static final PackageNode relational_string = new PackageNode();
 	public static final PackageNode relational_identifier = new PackageNode();
 	
 	/**
 	 * 0 = None;
-	 * 1 = Boolean;
-	 * 2 = Arithmetic Integer;
-	 * 3 = Arithmetic Real;
+	 * 1 = Arithmetic;
+	 * 2 = Relational & Conditional;
 	 */
 	private static int mode = 0;
 
@@ -36,7 +32,7 @@ public abstract class AssignmentLogic {
 			"Arithmetic Operator",
 			(lexeme, token_class) -> {
 				boolean flag =
-						mode != 1 &&
+						mode != 2 &&
 						Resources.ARITHMETIC_OPERATOR.parse(lexeme, token_class);
 				
 				if (flag)
@@ -50,7 +46,7 @@ public abstract class AssignmentLogic {
 			"Relational Operator",
 			(lexeme, token_class) -> {
 				boolean flag =
-						(mode == 0 || mode == 1) &&
+						mode != 1 &&
 						Resources.RELATIONAL_OPERATOR.parse(lexeme, token_class);
 				
 				if (flag)
@@ -77,29 +73,18 @@ public abstract class AssignmentLogic {
 			}
 	);
 	
-	private static final ConditionNode ASSIGNMENT = new ConditionNode(
-			"Assignment",
-			(lexeme, token_class) -> {
-				mode = 0;
-				return Resources.ASSIGNMENT.parse(
-						lexeme,
-						token_class
-				);
-			}
-	);
-	
 	private static final ConditionNode BOOLEAN = new ConditionNode(
 			"Boolean",
 			(lexeme, token_class) -> {
 				boolean flag =
-						(mode == 0 || mode == 1) &&
+						mode != 1 &&
 						Resources.BOOLEAN.parse(
 								lexeme,
 								token_class
 						);
 				
 				if (flag)
-					mode = 1;
+					mode = 2;
 				
 				return flag;
 			}
@@ -109,77 +94,96 @@ public abstract class AssignmentLogic {
 			"Not",
 			(lexeme, token_class) -> {
 				boolean flag =
-						(mode == 0 || mode == 1) &&
+						mode != 1 &&
 						Resources.NOT.parse(
 								lexeme,
 								token_class
 						);
 				
 				if (flag)
-					mode = 1;
+					mode = 2;
 				
 				return flag;
 			}
 	);
 	
 	public static void initialize() {
+		Resources.error_index.put(
+				new String[] {
+					"Integer",
+					"Real",
+					"String",
+					"Not",
+					"Boolean",
+					"Identifier",
+					"Open Parenthesis"
+				},
+				0
+		);
+
+		Resources.error_index.put(
+				new String[] {
+					"Arithmetic Operator",
+					"Relational Operator",
+					"Boolean Conditional Operator"
+				},
+				1
+		);
+		
+		
 		declare.set(() -> INode.stack(
 				"Assignment.Declare",
-				ASSIGNMENT,
+				Resources.ASSIGNMENT,
 				new OrNode(content, group)
 		));
 		
-		group.set(() -> INode.stack(
-				"Assignment.Group",
-				Resources.OPEN_PARENTHESIS,
-				new OrNode(content, group),
-				Resources.CLOSE_PARENTHESIS,
-				new OrNode(
-						arithmetic_integer,
-						arithmetic_real,
-						relational_integer,
-						relational_real,
-						relational_boolean,
-						relational_string,
-						relational_identifier,
-						INode.stack(
-								BOOLEAN_CONDITIONAL_OPERATOR,
-								new OrNode(
-										BooleanExpressionLogic.declare,
-										BooleanExpressionLogic.group,
-										BooleanExpressionLogic.negation
-								)
-						)
-				)
-		));
+		group.set(() -> {
+			mode = 0;
+			
+			return INode.stack(
+					"Assignment.Group",
+					Resources.OPEN_PARENTHESIS,
+					new OrNode(content, group),
+					Resources.CLOSE_PARENTHESIS,
+					new OrNode(
+							arithmetic_number,
+							relational_number,
+							relational_boolean,
+							relational_string,
+							relational_identifier,
+							INode.stack(
+									BOOLEAN_CONDITIONAL_OPERATOR,
+									new OrNode(
+											BooleanExpressionLogic.declare,
+											BooleanExpressionLogic.group,
+											BooleanExpressionLogic.negation
+									)
+							),
+							null
+					)
+			);
+		});
 		
-		content.set(() -> INode.stack(
-				"Assignment.Content",
-				new OrNode(
-						content_integer,
-						content_real,
-						content_string,
-						content_boolean,
-						content_identifier
-				)
-		));
+		content.set(() -> {
+			mode = 0;
+			
+			return INode.stack(
+					"Assignment.Content",
+					new OrNode(
+							content_number,
+							content_string,
+							content_boolean,
+							content_identifier
+					)
+			);
+		});
 		
-		content_integer.set(() -> INode.stack(
+		content_number.set(() -> INode.stack(
 				"Assignment.Content.Integer",
-				Resources.INTEGER,
+				GenericLogic.NUMBER,
 				new OrNode(
-						arithmetic_integer,
-						relational_integer,
-						null
-				)
-		));
-		
-		content_real.set(() -> INode.stack(
-				"Assignment.Content.Real",
-				Resources.REAL,
-				new OrNode(
-						arithmetic_real,
-						relational_real,
+						arithmetic_number,
+						relational_number,
 						null
 				)
 		));
@@ -215,10 +219,8 @@ public abstract class AssignmentLogic {
 				"Assignment.Content.String",
 				GenericLogic.IDENTIFIER_OR_CALLABLE,
 				new OrNode(
-						arithmetic_integer,
-						arithmetic_real,
-						relational_integer,
-						relational_real,
+						arithmetic_number,
+						relational_number,
 						relational_boolean,
 						relational_string,
 						relational_identifier,
@@ -226,46 +228,26 @@ public abstract class AssignmentLogic {
 				)
 		));
 		
-		arithmetic_integer.set(() -> INode.stack(
-				"Assignment.Arithmetic.Integer",
+		arithmetic_number.set(() -> INode.stack(
+				"Assignment.Arithmetic.Number",
 				ARITHMETIC_OPERATOR,
-				new OrNode(Resources.INTEGER, GenericLogic.IDENTIFIER_OR_CALLABLE, ArithmeticLogic.group_integer),
-				new OrNode(ArithmeticLogic.content_integer, null)
+				new OrNode(
+						GenericLogic.NUMBER,
+						GenericLogic.IDENTIFIER_OR_CALLABLE,
+						ArithmeticLogic.group_number
+				),
+				new OrNode(ArithmeticLogic.content_number, null)
 		));
 		
-		arithmetic_real.set(() -> INode.stack(
-				"Assignment.Arithmetic.Real",
-				ARITHMETIC_OPERATOR,
-				new OrNode(Resources.REAL, GenericLogic.IDENTIFIER_OR_CALLABLE, ArithmeticLogic.group_real),
-				new OrNode(ArithmeticLogic.content_real, null)
-		));
-		
-		relational_integer.set(() -> INode.stack(
+		relational_number.set(() -> INode.stack(
 				"Assignment.Conditional.Integer",
 				RELATIONAL_OPERATOR,
 				new OrNode(
-						Resources.INTEGER,
+						GenericLogic.NUMBER,
 						GenericLogic.IDENTIFIER_OR_CALLABLE
 				),
 				new OrNode(
-						ArithmeticLogic.content_integer,
-						null
-				),
-				new OrNode(
-						BooleanExpressionLogic.conditional_operator,
-						null
-				)
-		));
-		
-		relational_real.set(() -> INode.stack(
-				"Assignment.Conditional.Real",
-				RELATIONAL_OPERATOR,
-				new OrNode(
-						Resources.REAL,
-						GenericLogic.IDENTIFIER_OR_CALLABLE
-				),
-				new OrNode(
-						ArithmeticLogic.content_real,
+						ArithmeticLogic.content_number,
 						null
 				),
 				new OrNode(

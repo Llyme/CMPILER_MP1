@@ -7,8 +7,7 @@ import node.PackageNode;
 
 public abstract class BooleanExpressionLogic {
 	public static final PackageNode declare = new PackageNode();
-	public static final PackageNode declare_integer = new PackageNode();
-	public static final PackageNode declare_real = new PackageNode();
+	public static final PackageNode declare_number = new PackageNode();
 	public static final PackageNode declare_string = new PackageNode();
 	public static final PackageNode declare_boolean = new PackageNode();
 	public static final PackageNode declare_identifier = new PackageNode();
@@ -25,37 +24,22 @@ public abstract class BooleanExpressionLogic {
 				new OrNode(
 						group,
 						negation,
-						INode.stack(ArithmeticLogic.declare_integer, declare_integer),
-						INode.stack(ArithmeticLogic.declare_real, declare_real),
+						INode.stack(ArithmeticLogic.declare_number, declare_number),
 						INode.stack(Resources.STRING, declare_string),
 						INode.stack(Resources.BOOLEAN, declare_boolean),
 						INode.stack(GenericLogic.IDENTIFIER_OR_CALLABLE, declare_identifier)
 				)
 		));
 		
-		declare_integer.set(() -> INode.stack(
-				"BooleanExpression.Declare.Integer",
+		declare_number.set(() -> INode.stack(
+				"BooleanExpression.Declare.Number",
 				Resources.RELATIONAL_OPERATOR,
 				new OrNode(
-						Resources.INTEGER,
+						GenericLogic.NUMBER,
 						GenericLogic.IDENTIFIER_OR_CALLABLE
 				),
 				new OrNode(
-						ArithmeticLogic.content_integer,
-						null
-				),
-				new OrNode(conditional_operator, null)
-		));
-		
-		declare_real.set(() -> INode.stack(
-				"BooleanExpression.Declare.Real",
-				Resources.RELATIONAL_OPERATOR,
-				new OrNode(
-						Resources.REAL,
-						GenericLogic.IDENTIFIER_OR_CALLABLE
-				),
-				new OrNode(
-						ArithmeticLogic.content_real,
+						ArithmeticLogic.content_number,
 						null
 				),
 				new OrNode(conditional_operator, null)

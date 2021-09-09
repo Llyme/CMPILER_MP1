@@ -103,6 +103,7 @@ public class MainWindow {
 		BooleanExpressionLogic.initialize();
 		AssignmentLogic.initialize();
 		GenericLogic.initialize();
+		WhileLoopLogic.initialize();
 		
 		
 		// Get error descriptors.

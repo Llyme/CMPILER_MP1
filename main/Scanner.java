@@ -336,7 +336,8 @@ public class Scanner {
 							// Double dot.
 							
 							if (i - start > 1) {
-								// There is a lexeme behind the double dot. Return that first.
+								// There is a lexeme behind the double dot.
+								// Return that first.
 								return line.substring(start, i - 1);
 							}
 							
@@ -354,9 +355,17 @@ public class Scanner {
 						// Just started. Wait for any leading characters.
 						continue;
 
-					if (line.substring(start, i).trim().matches(".*[^0-9].*"))
-						// There are non-digits in the capture. Return without the dot.
-						return line.substring(start, i);
+					String result = line.substring(start, i);
+					
+					if (result.trim().matches(".*[^0-9].*")) {
+						// There are non-digits in the capture.
+						// Return without the dot.
+						MainWindow.appendConsoleText("BRUH");
+						return result;
+					}
+					
+					// No problem so far. Continue.
+					continue;
 					
 				} else {
 					// Non-dot characters.
@@ -366,15 +375,39 @@ public class Scanner {
 						return line.substring(start, i + 1);
 					
 					} else if (Character.isDigit(c)) {
-						// No problems involved with digits.
+						// Get the lexeme before this character.
+						String result = line.substring(start, i);
+						
+						if (result.matches(Resources.REGEX_REAL)) {
+							// A real number so far.
+							continue;
+						}
+							
+						if (result.matches("[^a-zA-Z0-9_]"))
+							// A special character was used
+							// before identifier-safe characters.
+							// Return everything before this character.
+							return result;
+						
 						continue;
 						
-					} else if (Character.isLetterOrDigit(c) || c == '_') {
+					} else if (Character.isLetter(c) || c == '_') {
 						// Possible characters for identifiers.
+						
+						// Get the lexeme before this character.
+						String result = line.substring(start, i);
+						
+						if (result.matches("[^a-zA-Z0-9_]"))
+							// A special character was used
+							// before identifier-safe characters.
+							// Return everything before this character.
+							return result;
 						
 						if (dot)
 							// A dot was previously read. Return everything besides this character.
-							return line.substring(start, i);
+							return result;
+						
+						continue;
 						
 					} else if (Helper.contains(Resources.special_characters, c)) {
 						// Special characters like semicolon, comma, parenthesis, and brackets.
@@ -384,8 +417,37 @@ public class Scanner {
 						else
 							// A lexeme is behind this character.
 							return line.substring(start, i);
+					} else {
+						// Multi-line lexemes with special characters.
+						
+						String[][] specials = new String[][] {
+							Resources.arithmetic_operators,
+							Resources.relational_operators
+						};
+						
+						Boolean flag = false;
+						String cut = line.substring(start, i);
+						
+						for (String[] list : specials) {
+							for (String lexeme : list)
+								if (lexeme.startsWith(cut)) {
+									flag = true;
+									break;
+								}
+							
+							if (flag)
+								break;
+						}
+						
+						if (flag)
+							// A lexeme starts with these set of characters.
+							// Continue.
+							continue;
 					}
 				}
+				
+				// Nothing matched. Return up to the cursor's position.
+				return line.substring(start, i + 1);
 			}
 		}
 		
@@ -457,7 +519,7 @@ public class Scanner {
 		if (lexeme.matches("^-?[0-9]*$"))
 			return "integer";
 
-		if (lexeme.matches("^-?[0-9]*\\.?[0-9]*$"))
+		if (lexeme.matches(Resources.REGEX_REAL))
 			return "real";
 		
 		{
@@ -467,7 +529,7 @@ public class Scanner {
 				return "predeclared";
 		}
 		
-		if (lexeme.matches("^[a-zA-Z0-9_]*$"))
+		if (lexeme.matches("^[a-zA-Z_]+[a-zA-Z0-9_]*$"))
 			return "identifier";
 		
 		return "unknown";
