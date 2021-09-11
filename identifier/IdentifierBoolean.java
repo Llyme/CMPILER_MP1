@@ -1,25 +1,18 @@
 package identifier;
-public class IdentifierBoolean implements IIdentifier {
-	private String name;
-	private Boolean predeclared;
-	private Boolean value;
+public class IdentifierBoolean extends Identifier {
+	private boolean value;
 	
-	public IdentifierBoolean(String name, Boolean predeclared, Boolean initialValue) {
-		this.name = name;
-		this.predeclared = predeclared;
-		value = initialValue;
+	public IdentifierBoolean(String name, Boolean predeclared) {
+		super(name, predeclared);
 	}
 	
-	public String getName() {
-		return name;
+	public IdentifierBoolean(String name, Boolean predeclared, Boolean initialValue) {
+		this(name, predeclared);
+		setValue(initialValue.toString());
 	}
 	
 	public String getDataType() {
 		return "boolean";
-	}
-	
-	public Boolean isPredeclared() {
-		return predeclared;
 	}
 
 	public Object getValue() {
@@ -27,10 +20,11 @@ public class IdentifierBoolean implements IIdentifier {
 	}
 
 	public void setValue(String lexeme) {
+		super.setValue();
 		this.value = Boolean.parseBoolean(lexeme);
 	}
 
-	public Boolean isValid(String lexeme) {
+	public boolean isValid(String lexeme) {
 		return lexeme == "false" || lexeme == "true";
 	}
 }

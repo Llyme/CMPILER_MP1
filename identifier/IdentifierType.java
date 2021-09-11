@@ -1,38 +1,36 @@
 package identifier;
-public class IdentifierType implements IIdentifier {
-	private String name;
-	private Boolean predeclared;
+public class IdentifierType extends Identifier {
+	private String value;
 	
-	public IdentifierType(String name, Boolean predeclared) {
-		this.name = name;
-		this.predeclared = predeclared;
-	}
-	
-	public String getName() {
-		return name;
+	/**
+	 * Name is also the value.
+	 */
+	public IdentifierType(String name) {
+		super(name, true);
+		super.setValue();
+		this.value = name;
 	}
 	
 	public String getDataType() {
 		return "type";
 	}
 	
-	public Boolean isPredeclared() {
-		return predeclared;
-	}
-
 	public Object getValue() {
-		return this;
+		return value;
 	}
 
+	/**
+	 * @deprecated This is immutable.
+	 */
 	@Deprecated
 	public void setValue(String lexeme) {
 	}
 
 	/**
-	 * Data types are immutable and should not be edited.
+	 * @deprecated This is immutable.
 	 */
 	@Deprecated
-	public Boolean isValid(String lexeme) {
+	public boolean isValid(String lexeme) {
 		return false;
 	}
 }

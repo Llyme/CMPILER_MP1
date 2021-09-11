@@ -1,25 +1,13 @@
 package identifier;
-public class IdentifierCharacter implements IIdentifier {
-	private String name;
-	private Boolean predeclared;
+public class IdentifierCharacter extends Identifier {
 	private char value;
 	
-	public IdentifierCharacter(String name, Boolean predeclared, char initialValue) {
-		this.name = name;
-		this.predeclared = predeclared;
-		value = initialValue;
-	}
-	
-	public String getName() {
-		return name;
+	public IdentifierCharacter(String name, boolean predeclared) {
+		super(name, predeclared);
 	}
 	
 	public String getDataType() {
 		return "character";
-	}
-	
-	public Boolean isPredeclared() {
-		return predeclared;
 	}
 
 	public Object getValue() {
@@ -30,7 +18,7 @@ public class IdentifierCharacter implements IIdentifier {
 		this.value = lexeme.charAt(0);
 	}
 
-	public Boolean isValid(String lexeme) {
+	public boolean isValid(String lexeme) {
 		return lexeme.length() == 1;
 	}
 }

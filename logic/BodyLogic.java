@@ -4,17 +4,17 @@ import main.*;
 import node.*;
 
 public abstract class BodyLogic {
-	public static PackageNode declare = new PackageNode();
-	public static PackageNode declare_semicolon = new PackageNode();
+	public static final PackageNode declare = new PackageNode();
+	public static final PackageNode declare_semicolon = new PackageNode();
 	
-	public static PackageNode content = new PackageNode();
-	public static PackageNode content_recursive = new PackageNode();
+	public static final PackageNode content = new PackageNode();
+	public static final PackageNode content_recursive = new PackageNode();
 	
-	public static PackageNode identifier = new PackageNode();
+	public static final PackageNode identifier = new PackageNode();
 	
-	public static PackageNode call = new PackageNode();
-	public static PackageNode call_param = new PackageNode();
-	public static PackageNode call_param_comma = new PackageNode();
+	public static final PackageNode call = new PackageNode();
+	public static final PackageNode call_param = new PackageNode();
+	public static final PackageNode call_param_comma = new PackageNode();
 	
 	public static void initialize() {
 		declare.set(() -> INode.stack(

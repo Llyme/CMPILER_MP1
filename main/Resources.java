@@ -21,6 +21,19 @@ public final class Resources {
 			(lexeme, token_class) -> token_class.equals("identifier")
 		);
 	
+	public static final ConditionNode IDENTIFIER_AND_RECORD =
+			new ConditionNode(
+				"Identifier",
+				(lexeme, token_class) -> {
+					boolean flag = IDENTIFIER.parse(lexeme, token_class);
+					
+					if (flag)
+						Interpreter.record();
+					
+					return flag;
+				}
+			);
+	
 	public static final ConditionNode PREDECLARED = new ConditionNode(
 			"Predeclared",
 			(lexeme, token_class) ->

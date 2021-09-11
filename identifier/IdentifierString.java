@@ -1,27 +1,15 @@
 package identifier;
-public class IdentifierString implements IIdentifier {
-	private String name;
-	private Boolean predeclared;
+public class IdentifierString extends Identifier {
 	private String value;
 	
-	public IdentifierString(String name, Boolean predeclared, String initialValue) {
-		this.name = name;
-		this.predeclared = predeclared;
-		value = initialValue;
-	}
-	
-	public String getName() {
-		return name;
+	public IdentifierString(String name, boolean predeclared) {
+		super(name, predeclared);
 	}
 	
 	public String getDataType() {
 		return "string";
 	}
 	
-	public Boolean isPredeclared() {
-		return predeclared;
-	}
-
 	public Object getValue() {
 		return value;
 	}
@@ -33,7 +21,13 @@ public class IdentifierString implements IIdentifier {
 			this.value = lexeme.substring(1, lexeme.length() - 1);
 	}
 
-	public Boolean isValid(String lexeme) {
-		return lexeme.length() == 1;
+	public boolean isValid(String lexeme) {
+		if (lexeme.equals("null"))
+			return true;
+		
+		if (lexeme.startsWith("'") && lexeme.endsWith("'"))
+			return true;
+		
+		return false;
 	}
 }

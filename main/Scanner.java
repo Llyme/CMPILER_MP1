@@ -13,7 +13,7 @@ import logic.*;
 import node.*;
 
 public class Scanner {
-	private ArrayList<IIdentifier> identifiers = new ArrayList<IIdentifier>();
+	private ArrayList<Identifier> identifiers = new ArrayList<Identifier>();
 	/**
 	 * If the scanner is in comment mode.
 	 * This allows multiline comment across multiple feed.
@@ -21,56 +21,52 @@ public class Scanner {
 	private String comment = null;
 	private String programName = null;
 	private String currentLine = null;
-	private Boolean waitingUserInput = false;
-	/**
-	 * The latest user input when `waitingUserInput` was enabled.
-	 */
-	private String userInput = null;
-	/**
-	 * Currently targeted identifier for assignment.
-	 */
-	private IIdentifier targetIdentifier = null;
-	/**
-	 * Currently targeted procedure or function on construction.
-	 */
-	private IdentifierProcedure targetProcedure = null;
-	/**
-	 * Prevents the first few lexeme-class pair from being written.
-	 */
-	private int targetProcedurePadding = 2;
-	/**
-	 * A stack of procedures/functions being prioritized
-	 * before going back to the main program.
-	 */
-	private Stack<IdentifierProcedure> procedureStack = new Stack<IdentifierProcedure>();
-	/**
-	 * An array of identifiers queued for variable declaration.
-	 */
-	private ArrayList<String> identifierQueue = new ArrayList<String>();
 	
 	public Scanner() {
 		// Initialize predefined identifiers.
-		identifiers.add(new IdentifierType("boolean", true));
-		identifiers.add(new IdentifierType("real", true));
-		identifiers.add(new IdentifierBoolean("true", true, true));
-		identifiers.add(new IdentifierFunction(
-			"read",
-			true,
-			false,
-			"" // Passing an empty string ignores data type.
+		Interpreter.identifiers()
+		.addToGlobal(new IdentifierType(
+				// DATA TYPES
+				
+				"boolean"
+		)).addToGlobal(new IdentifierType(
+				"real"
+		)).addToGlobal(new IdentifierType(
+				"char"
+		)).addToGlobal(new IdentifierType(
+				"integer"
+		)).addToGlobal(new IdentifierType(
+				"string"
+				
+				
+				// BOOLEAN
+				
+		)).addToGlobal(new IdentifierBoolean(
+				"true",
+				true,
+				true // Initial value.
+		)).addToGlobal(new IdentifierBoolean(
+				"false",
+				true,
+				false // Initial value.
+				
+				
+				// CALLABLES
+				
+		)).addToGlobal(new IdentifierProcedure(
+				"read",
+				true
+		)).addToGlobal(new IdentifierProcedure(
+				"write",
+				true
+		)).addToGlobal(new IdentifierProcedure(
+				"readln",
+				true
+		)).addToGlobal(new IdentifierProcedure(
+				"writeln",
+				true
 		));
-		identifiers.add(new IdentifierProcedure(
-			"write",
-			true,
-			true,
-			""
-		));
-		identifiers.add(new IdentifierType("char", true));
-		identifiers.add(new IdentifierType("integer", true));
-		identifiers.add(new IdentifierBoolean("false", true, false));
-		identifiers.add(new IdentifierFunction("readln", true, false, null, ""));
-		identifiers.add(new IdentifierProcedure("writeln", true, true, ""));
-		identifiers.add(new IdentifierType("string", true));
+		
 		Parser.node = RootLogic.declare;
 	}
 	
@@ -82,77 +78,20 @@ public class Scanner {
 		this.programName = programName;
 	}
 	
-	public IIdentifier getIdentifier(String name) {
-		for (IIdentifier identifier : identifiers)
+	public Identifier getIdentifier(String name) {
+		for (Identifier identifier : identifiers)
 			if (identifier.getName().equals(name))
 				return identifier;
 		
 		return null;
 	}
 	
-	public void addIdentifierQueue(String name) {
-		identifierQueue.add(name);
-	}
-	
-	public void clearIdentifierQueue() {
-		identifierQueue.clear();
-	}
-	
-	public ArrayList<String> getIdentifierQueue() {
-		return identifierQueue;
-	}
-	
-	public void addIdentifier(IIdentifier identifier) {
+	public void addIdentifier(Identifier identifier) {
 		identifiers.add(identifier);
-	}
-	
-	public Boolean getWaitingUserInput() {
-		return waitingUserInput;
-	}
-	
-	public void waitForUserInput() {
-		waitingUserInput = true;
-	}
-	
-	public String getUserInput() {
-		return userInput;
-	}
-	
-	public IIdentifier getTargetIdentifier() {
-		return targetIdentifier;
-	}
-	
-	public void setTargetIdentifier(IIdentifier identifier) {
-		targetIdentifier = identifier;
-	}
-	
-	public IdentifierProcedure getTargetProcedure() {
-		return targetProcedure;
-	}
-	
-	public void setTargetProcedure(IdentifierProcedure value) {
-		targetProcedurePadding = 2;
-		targetProcedure = value;
 	}
 	
 	public String getCurrentLine() {
 		return currentLine;
-	}
-	
-	public Boolean procedureStackEmpty() {
-		return procedureStack.isEmpty();
-	}
-	
-	public IdentifierProcedure procedureStackPeek() {
-		return procedureStack.peek();
-	}
-	
-	public IdentifierProcedure popProcedureStack() {
-		return procedureStack.pop();
-	}
-	
-	public void pushProcedureStack(IdentifierProcedure value) {
-		procedureStack.push(value);
 	}
 	
 	public int read_line(String line) {
@@ -178,16 +117,11 @@ public class Scanner {
 			log("");
 			
 			if (flag) {
-				IdentifierProcedure target = getTargetProcedure();
+				// Only interpret if there are no errors.
+				Interpreter.record(new LexemeTokenPair(lexeme, token_class));
 				
-				if (target != null)
-					// Write into target procedure/function.
-					if (targetProcedurePadding > 0)
-						targetProcedurePadding--;
-					else if (!token_class.equals("comment"))
-						// Exclude comments because they do nothing.
-						target.push(lexeme, token_class);
 			} else {
+				// Trace the error and print it.
 				INode[] error_trace = Parser.getErrorTrace();
 				String[] flag0 = null;
 				
@@ -523,7 +457,7 @@ public class Scanner {
 			return "real";
 		
 		{
-			IIdentifier identifier = getIdentifier(lexeme);
+			Identifier identifier = getIdentifier(lexeme);
 			
 			if (identifier != null && identifier.isPredeclared())
 				return "predeclared";

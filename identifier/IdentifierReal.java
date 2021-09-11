@@ -1,28 +1,13 @@
 package identifier;
-public class IdentifierReal implements IIdentifier {
-	private String name;
-	private Boolean predeclared;
+public class IdentifierReal extends Identifier {
 	private float value;
 	
-	public IdentifierReal
-	(String name,
-	Boolean predeclared,
-	float initialValue) {
-		this.name = name;
-		this.predeclared = predeclared;
-		value = initialValue;
-	}
-	
-	public String getName() {
-		return name;
+	public IdentifierReal(String name, boolean predeclared) {
+		super(name, predeclared);
 	}
 	
 	public String getDataType() {
 		return "real";
-	}
-	
-	public Boolean isPredeclared() {
-		return predeclared;
 	}
 
 	public Object getValue() {
@@ -33,7 +18,7 @@ public class IdentifierReal implements IIdentifier {
 		value = Float.parseFloat(lexeme);
 	}
 
-	public Boolean isValid(String lexeme) {
+	public boolean isValid(String lexeme) {
 		return lexeme.matches("^-?[0-9]*\\.?[0-9]*$");
 	}
 }

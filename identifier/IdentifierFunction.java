@@ -1,6 +1,6 @@
 package identifier;
 
-public class IdentifierFunction extends IdentifierProcedure implements IIdentifier {
+public class IdentifierFunction extends IdentifierProcedure {
 	private String returnType;
 	
 	public IdentifierFunction
@@ -9,11 +9,10 @@ public class IdentifierFunction extends IdentifierProcedure implements IIdentifi
 	Boolean varargs,
 	String returnType,
 	String... parameterTypes) {
-		super(name, predeclared, varargs, parameterTypes);
+		super(name, predeclared, parameterTypes);
 		this.returnType = returnType;
 	}
 	
-	@Override
 	public String getDataType() {
 		return "function";
 	}

@@ -2,93 +2,73 @@ package identifier;
 
 import java.util.ArrayList;
 
-public class IdentifierProcedure implements IIdentifier {
-	private String name;
-	private Boolean predeclared;
-	private ArrayList<String> lexemes = new ArrayList<String>();
-	private ArrayList<String> token_classes = new ArrayList<String>();
-	private ArrayList<String> parameterTypes = new ArrayList<String>();
-	/**
-	 * Allows extensible parameters.
-	 * The extended parameters are the same as the last parameter type.
-	 */
-	private Boolean varargs;
+import main.LexemeTokenPair;
+
+public class IdentifierProcedure extends Identifier {
+	private ArrayList<LexemeTokenPair> pairs = new ArrayList<LexemeTokenPair>();
+	private String[] parameterTypes;
 	
 	/**
 	 * Passing a parameter type with empty string ignores data type.
+	 * @param name
+	 * @param predeclared
+	 * @param parameterTypes data types.
 	 */
 	public IdentifierProcedure
 	(String name,
-	Boolean predeclared,
-	Boolean varargs,
+	boolean predeclared,
 	String... parameterTypes) {
-		this.name = name;
-		this.predeclared = predeclared;
-		this.varargs = varargs;
-		
-		for (String text : parameterTypes)
-			this.parameterTypes.add(text);
-	}
-	
-	public String getName() {
-		return name;
+		super(name, predeclared);
+		this.parameterTypes = parameterTypes;
 	}
 	
 	public String getDataType() {
 		return "procedure";
 	}
-	
-	public Boolean isPredeclared() {
-		return predeclared;
-	}
 
 	/**
-	 * Adds a lexeme-class pair.
+	 * Adds a lexeme-token pair.
 	 */
-	public void push(String lexeme, String token_class) {
-		lexemes.add(lexeme);
-		token_classes.add(token_class);
+	public void append(String lexeme, String token_class) {
+		pairs.add(new LexemeTokenPair(lexeme, token_class));
 	}
 	
-	public String getLexeme(int i) {
-		return lexemes.get(i);
-	}
-
-	public String getTokenClass(int i) {
-		return token_classes.get(i);
+	public int pairsLength() {
+		return pairs.size();
 	}
 	
-	public int parameterCount() {
-		return parameterTypes.size();
+	public LexemeTokenPair get(int index) {
+		return pairs.get(index);
+	}
+	
+	public int parameterLength() {
+		return parameterTypes.length;
 	}
 	
 	public String getParameterType(int i) {
-		int last = parameterTypes.size() - 1;
-		
-		if (i > last && varargs)
-			return parameterTypes.get(last);
-		
-		return parameterTypes.get(i);
+		return parameterTypes[i];
 	}
 	
-	public Boolean hasVarargs() {
-		return varargs;
-	}
-	
+	/**
+	 * @deprecated This is a callable. It doesn't contain any values.
+	 */
 	@Deprecated
 	public Object getValue() {
 		return null;
 	}
 
+	/**
+	 * @deprecated This is a callable. It doesn't contain any values.
+	 */
 	@Deprecated
 	public void setValue(String lexeme) {
 	}
 
 	/**
-	 * Functions are immutable.
+	 * @deprecated Callables are immutable.
 	 */
 	@Deprecated
-	public Boolean isValid(String lexeme) {
+	public boolean isValid(String lexeme) {
 		return false;
 	}
 }
