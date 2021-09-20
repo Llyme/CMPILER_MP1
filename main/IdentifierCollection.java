@@ -13,7 +13,7 @@ public class IdentifierCollection {
 	/**
 	 * Global identifiers.
 	 */
-	private final HashMap<String, Identifier> global =
+	public final HashMap<String, Identifier> global =
 			new HashMap<String, Identifier>();
 	/**
 	 * Temporary identifiers.

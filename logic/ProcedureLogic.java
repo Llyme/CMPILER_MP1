@@ -1,9 +1,10 @@
 package logic;
 
-import main.Resources;
-import node.INode;
-import node.OrNode;
-import node.PackageNode;
+import java.util.ArrayList;
+
+import identifier.*;
+import main.*;
+import node.*;
 
 public abstract class ProcedureLogic {
 	public static final PackageNode declare = new PackageNode();
@@ -14,13 +15,23 @@ public abstract class ProcedureLogic {
 		declare.set(() -> INode.stack(
 				"Procedure.Declare",
 				Resources.PROCEDURE,
+				
+				INode.record(),
+				
 				Resources.IDENTIFIER,
 				Resources.OPEN_PARENTHESIS,
 				new OrNode(parameter, null),
 				Resources.CLOSE_PARENTHESIS,
 				Resources.SEMICOLON,
+				
+				INode.a(() -> interpret()),
+				
 				BodyLogic.declare,
 				Resources.SEMICOLON,
+				
+				// Pop the intercepting procedure.
+				INode.a(() -> Interpreter.procedure(null)),
+				
 				new OrNode(declare, FunctionLogic.declare, null)
 		));
 		
@@ -38,5 +49,40 @@ public abstract class ProcedureLogic {
 				Resources.COMMA,
 				parameter
 		));
+	}
+	
+	private static void interpret() {
+		LexemeTokenPair[] pairs = Interpreter.flush();
+		ArrayList<String> identifiers = new ArrayList<String>();
+		ArrayList<String> dataTypes = new ArrayList<String>();
+		
+		
+		// Collect the parameters.
+		
+		for (int i = 3; i < pairs.length; i += 5) {
+			LexemeTokenPair pair = pairs[i];
+			
+			if (!pair.token().equals("identifier"))
+				break;
+			
+			identifiers.add(pair.lexeme());
+			dataTypes.add(pairs[i + 2].lexeme());
+		}
+		
+		
+		// Build the procedure.
+		
+		IdentifierProcedure procedure = new IdentifierProcedure(
+				pairs[0].lexeme(),
+				false,
+				identifiers,
+				dataTypes
+		);
+		
+		
+		// Add to global and intercept the recorder.
+		
+		Interpreter.identifiers().addToGlobal(procedure);
+		Interpreter.procedure(procedure);
 	}
 }

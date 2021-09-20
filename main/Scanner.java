@@ -6,92 +6,37 @@ import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Stack;
 
 import identifier.*;
 import logic.*;
 import node.*;
 
 public class Scanner {
-	private ArrayList<Identifier> identifiers = new ArrayList<Identifier>();
+	private ArrayList<LexemeTokenPair> pairs =
+			new ArrayList<LexemeTokenPair>();
 	/**
 	 * If the scanner is in comment mode.
 	 * This allows multiline comment across multiple feed.
 	 */
 	private String comment = null;
-	private String programName = null;
 	private String currentLine = null;
 	
 	public Scanner() {
 		// Initialize predefined identifiers.
-		Interpreter.identifiers()
-		.addToGlobal(new IdentifierType(
-				// DATA TYPES
-				
-				"boolean"
-		)).addToGlobal(new IdentifierType(
-				"real"
-		)).addToGlobal(new IdentifierType(
-				"char"
-		)).addToGlobal(new IdentifierType(
-				"integer"
-		)).addToGlobal(new IdentifierType(
-				"string"
-				
-				
-				// BOOLEAN
-				
-		)).addToGlobal(new IdentifierBoolean(
-				"true",
-				true,
-				true // Initial value.
-		)).addToGlobal(new IdentifierBoolean(
-				"false",
-				true,
-				false // Initial value.
-				
-				
-				// CALLABLES
-				
-		)).addToGlobal(new IdentifierProcedure(
-				"read",
-				true
-		)).addToGlobal(new IdentifierProcedure(
-				"write",
-				true
-		)).addToGlobal(new IdentifierProcedure(
-				"readln",
-				true
-		)).addToGlobal(new IdentifierProcedure(
-				"writeln",
-				true
-		));
-		
+		Interpreter.reset();
 		Parser.node = RootLogic.declare;
-	}
-	
-	public String getProgramName() {
-		return programName;
-	}
-
-	public void setProgramName(String programName) {
-		this.programName = programName;
-	}
-	
-	public Identifier getIdentifier(String name) {
-		for (Identifier identifier : identifiers)
-			if (identifier.getName().equals(name))
-				return identifier;
-		
-		return null;
-	}
-	
-	public void addIdentifier(Identifier identifier) {
-		identifiers.add(identifier);
 	}
 	
 	public String getCurrentLine() {
 		return currentLine;
+	}
+	
+	public LexemeTokenPair pair(int index) {
+		return pairs.get(index);
+	}
+	
+	public int pairsLength() {
+		return pairs.size();
 	}
 	
 	public int read_line(String line) {
@@ -110,6 +55,7 @@ public class Scanner {
 				continue;
 			
 			String token_class = classify_lexeme(lexeme);
+			pairs.add(new LexemeTokenPair(lexeme, token_class));
 			console_dump(lexeme, token_class);
 			file_dump(lexeme, token_class);
 			boolean flag = Parser.parse(lexeme, token_class);
@@ -119,6 +65,13 @@ public class Scanner {
 			if (flag) {
 				// Only interpret if there are no errors.
 				Interpreter.record(new LexemeTokenPair(lexeme, token_class));
+				String error = Interpreter.error();
+				
+				if (error != null) {
+					// An error occured. Forcibly end the loop.
+					print_error(error);
+					break;
+				}
 				
 			} else {
 				// Trace the error and print it.
@@ -145,6 +98,11 @@ public class Scanner {
 					print_error(Parser.getGenericErrorMessage());
 			}
 		}
+		
+		
+		// Execute the action sequence.
+		
+		Interpreter.begin();
 		
 		return 1;
 	}
@@ -209,12 +167,6 @@ public class Scanner {
 					
 					// Terminate lexeme.
 					return line.substring(start, i + 1);
-				} else if (i - start >= 1) {
-					// Started a literal when there are non-whitespace before it.
-					String result = line.substring(start, i).trim();
-					
-					if (result.length() > 0)
-						return result;
 				} else
 					// Start literal mode with the same character
 					// as terminating character.
@@ -291,10 +243,9 @@ public class Scanner {
 
 					String result = line.substring(start, i);
 					
-					if (result.trim().matches(".*[^0-9].*")) {
-						// There are non-digits in the capture.
+					if (!result.trim().matches("^-?[0-9]*\\.?[0-9]*$")) {
+						// No longer a real number.
 						// Return without the dot.
-						MainWindow.appendConsoleText("BRUH");
 						return result;
 					}
 					
@@ -312,11 +263,10 @@ public class Scanner {
 						// Get the lexeme before this character.
 						String result = line.substring(start, i);
 						
-						if (result.matches(Resources.REGEX_REAL)) {
+						if (result.matches("^-?[0-9]*\\.?[0-9]*$"))
 							// A real number so far.
 							continue;
-						}
-							
+						
 						if (result.matches("[^a-zA-Z0-9_]"))
 							// A special character was used
 							// before identifier-safe characters.
@@ -377,6 +327,13 @@ public class Scanner {
 							// A lexeme starts with these set of characters.
 							// Continue.
 							continue;
+						
+						String result = line.substring(start, i);
+						
+						if (result.matches(".*\\w.*"))
+							// A word character is read.
+							// Return everything before the special character.
+							return result;
 					}
 				}
 				
@@ -457,7 +414,7 @@ public class Scanner {
 			return "real";
 		
 		{
-			Identifier identifier = getIdentifier(lexeme);
+			Identifier identifier = Interpreter.identifiers().get(lexeme);
 			
 			if (identifier != null && identifier.isPredeclared())
 				return "predeclared";

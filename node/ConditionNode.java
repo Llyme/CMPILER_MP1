@@ -20,6 +20,6 @@ public class ConditionNode implements INode {
 	}
 	
 	public boolean parse(String lexeme, String token_class) {
-		return condition.fire(lexeme, token_class);
+		return condition.invoke(lexeme, token_class);
 	}
 }

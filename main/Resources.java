@@ -8,7 +8,7 @@ public final class Resources {
 	public static final String ERROR_FILENAME = "error.txt";
 	
 	
-	public static final String REGEX_REAL = "^-?[0-9]*\\.?[0-9]*$";
+	public static final String REGEX_REAL = "^-?[0-9]\\.?[0-9]*$|^-?[0-9]*\\.?[0-9]$";
 	
 	
 	public static final ConditionNode PROGRAM = new ConditionNode(
@@ -214,6 +214,11 @@ public final class Resources {
 			(lexeme, token_class) -> lexeme.equals("while")
 		);
 	
+	public static final ConditionNode ARRAY = new ConditionNode(
+			"Array",
+			(lexeme, token_class) -> lexeme.equals("array")
+		);
+	
 	
 	public static final String[] reserved = new String[] {
 			"program",
@@ -264,6 +269,17 @@ public final class Resources {
 			"and",
 			"or",
 			"not"
+	};
+	
+	public static final String[] boolean_operators0 = new String[] {
+			"=",
+			"<>",
+			"<",
+			">",
+			"<=",
+			">=",
+			"and",
+			"or"
 	};
 	
 	public static final String[] data_types = new String[] {

@@ -2,6 +2,7 @@ package logic;
 
 import java.util.ArrayList;
 
+import identifier.*;
 import main.*;
 import node.*;
 
@@ -13,24 +14,6 @@ public abstract class VarLogic {
 	
 	public static final PackageNode array = new PackageNode();
 	
-	private static final ConditionNode SEMICOLON_AND_INTERPRET =
-			new ConditionNode(
-				"Semicolon",
-				(lexeme, token_class) -> {
-					boolean flag = Resources.SEMICOLON.parse(
-							lexeme,
-							token_class
-					);
-					
-					if (flag) {
-						interpret();
-						Interpreter.flush();
-					}
-					
-					return flag;
-				}
-			);
-	
 	public static void initialize() {
 		declare.set(() -> INode.stack(
 				"Var.Declare",
@@ -40,11 +23,17 @@ public abstract class VarLogic {
 		
 		content.set(() -> INode.stack(
 				"Var.Content",
-				Resources.IDENTIFIER_AND_RECORD,
+				Resources.IDENTIFIER,
+				
+				INode.record(1),
+				
 				new OrNode(content_append, null),
 				Resources.COLON,
 				new OrNode(array, Resources.DATA_TYPE),
-				SEMICOLON_AND_INTERPRET,
+				Resources.SEMICOLON,
+				
+				INode.a(() -> interpret()),
+				
 				new OrNode(content, null)
 		));
 		
@@ -57,6 +46,7 @@ public abstract class VarLogic {
 		
 		array.set(() -> INode.stack(
 				"Var.Array",
+				Resources.ARRAY,
 				Resources.OPEN_BRACKET,
 				Resources.INTEGER,
 				Resources.DOUBLE_DOT,
@@ -70,17 +60,19 @@ public abstract class VarLogic {
 	public static void interpret() {
 		// Get all of the identifiers.
 		
+		LexemeTokenPair[] pairs = Interpreter.flush();
+		IdentifierCollection collection = Interpreter.identifiers();
 		ArrayList<String> identifiers = new ArrayList<String>();
 		
-		for (int i = 0; i < Interpreter.size(); i++) {
-			LexemeTokenPair pair = Interpreter.get(i);
-			
+		for (LexemeTokenPair pair : pairs) {
 			if (!pair.token().equals("identifier"))
 				// Not an identifier.
 				continue;
 			
-			if (identifiers.contains(pair.lexeme())) {
+			if (identifiers.contains(pair.lexeme()) ||
+				collection.get(pair.lexeme()) != null) {
 				// ERROR! duplicate identifier!
+				Interpreter.error("Duplicate identifier token!");
 				return;
 			}
 			
@@ -91,21 +83,68 @@ public abstract class VarLogic {
 		
 		// Get data type.
 		
-		int index = Interpreter.indexOf(Resources.DATA_TYPE);
+		int index = Interpreter.indexOf(pairs, Resources.COLON);
+		String dataType = pairs[index + 1].lexeme();
 		
-		if (index == -1) {
-			// FATAL ERROR! No data type!
-			// This should not be possible as the parser
-			// filters this out.
-			return;
+		
+		// Generate identifiers.
+		
+		switch (dataType) {
+		case "boolean":
+			for (String identifier : identifiers)
+				collection.addToGlobal(new IdentifierBoolean(
+						identifier,
+						false
+				));
+			break;
+		case "character":
+			for (String identifier : identifiers)
+				collection.addToGlobal(new IdentifierCharacter(
+						identifier,
+						false
+				));
+			break;
+		case "integer":
+			for (String identifier : identifiers) {
+				collection.addToGlobal(new IdentifierInteger(
+						identifier,
+						false
+				));
+			}
+			break;
+		case "real":
+			for (String identifier : identifiers)
+				collection.addToGlobal(new IdentifierReal(
+						identifier,
+						false
+				));
+			break;
+		case "string":
+			for (String identifier : identifiers)
+				collection.addToGlobal(new IdentifierString(
+						identifier,
+						false
+				));
+			break;
+		case "array":
+			Func<Identifier> initializer = GenericLogic.identifierInitializer(
+					pairs[index + 8].lexeme()
+			);
+			
+			if (initializer == null)
+				return;
+			
+			for (String identifier : identifiers) {
+				collection.addToGlobal(new IdentifierArray(
+						identifier,
+						false,
+						dataType,
+						Integer.parseInt(pairs[index + 3].lexeme()),
+						Integer.parseInt(pairs[index + 5].lexeme()),
+						initializer
+				));
+			}
+			break;
 		}
-		
-		String datatype = Interpreter.get(index).lexeme();
-		
-		
-		//
-		
-		for (var q : identifiers)
-			MainWindow.appendConsoleText("WROTE " + q + " as " + datatype);
 	}
 }

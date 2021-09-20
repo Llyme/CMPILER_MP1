@@ -1,12 +1,14 @@
 package identifier;
 
 import java.util.ArrayList;
+import java.util.Stack;
 
-import main.LexemeTokenPair;
+import main.Action;
 
 public class IdentifierProcedure extends Identifier {
-	private ArrayList<LexemeTokenPair> pairs = new ArrayList<LexemeTokenPair>();
-	private String[] parameterTypes;
+	private ArrayList<Action> actions = new ArrayList<Action>();
+	private String[] identifiers;
+	private String[] dataTypes;
 	
 	/**
 	 * Passing a parameter type with empty string ignores data type.
@@ -17,36 +19,60 @@ public class IdentifierProcedure extends Identifier {
 	public IdentifierProcedure
 	(String name,
 	boolean predeclared,
-	String... parameterTypes) {
+	ArrayList<String> identifiers,
+	ArrayList<String> dataTypes) {
 		super(name, predeclared);
-		this.parameterTypes = parameterTypes;
+		this.identifiers = new String[identifiers.size()];
+		this.dataTypes = new String[dataTypes.size()];
+		identifiers.toArray(this.identifiers);
+		dataTypes.toArray(this.dataTypes);
+	}
+	
+	public IdentifierProcedure(String name, boolean predeclared) {
+		super(name, predeclared);
+		identifiers = new String[0];
+		dataTypes = new String[0];
 	}
 	
 	public String getDataType() {
 		return "procedure";
 	}
-
+	
+	public void append(Action action) {
+		actions.add(action);
+	}
+	
+	public Stack<Action> stack() {
+		Stack<Action> stack = new Stack<Action>();
+		
+		for (int i = actions.size() - 1; i >= 0; i--)
+			stack.push(actions.get(i));
+		
+		return stack;
+	}
+	
 	/**
-	 * Adds a lexeme-token pair.
+	 * Returns how many parameters this procedure has.
+	 * @return
 	 */
-	public void append(String lexeme, String token_class) {
-		pairs.add(new LexemeTokenPair(lexeme, token_class));
-	}
-	
-	public int pairsLength() {
-		return pairs.size();
-	}
-	
-	public LexemeTokenPair get(int index) {
-		return pairs.get(index);
-	}
-	
 	public int parameterLength() {
-		return parameterTypes.length;
+		return identifiers.length;
 	}
 	
-	public String getParameterType(int i) {
-		return parameterTypes[i];
+	/**
+	 * Returns the name of the parameter at the given index,
+	 * starting at index 0.
+	 */
+	public String getIdentifier(int i) {
+		return identifiers[i];
+	}
+	
+	/**
+	 * Returns the data type of the parameter at the given index,
+	 * starting at index 0.
+	 */
+	public String getDataType(int i) {
+		return dataTypes[i];
 	}
 	
 	/**

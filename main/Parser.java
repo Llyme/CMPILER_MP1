@@ -2,11 +2,7 @@ package main;
 
 import java.util.ArrayList;
 
-import node.ConditionNode;
-import node.INode;
-import node.OrNode;
-import node.PackageNode;
-import node.StackNode;
+import node.*;
 
 public class Parser {
 	/**
@@ -173,6 +169,10 @@ public class Parser {
 						0
 				);
 				
+				if (node0 instanceof ActionNode)
+					// Ignore ActionNodes.
+					continue;
+				
 				if (flag ||
 					!(node0 instanceof StackNode stack0) ||
 					stack0.nodes.size() > 0)
@@ -280,6 +280,11 @@ public class Parser {
 				
 				return false;
 			}
+		
+		if (node instanceof ActionNode action)
+			// ActionNodes' only purpose is to call a function.
+			// It does nothing logical to the parser.
+			action.parse(lexeme, token_class);
 		
 		return false;
 	}

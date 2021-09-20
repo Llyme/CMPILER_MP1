@@ -1,23 +1,27 @@
 package identifier;
 
+import java.util.ArrayList;
+
+import main.Func;
+
 public class IdentifierFunction extends IdentifierProcedure {
-	private String returnType;
+	private Identifier returnValue;
 	
 	public IdentifierFunction
 	(String name,
 	Boolean predeclared,
-	Boolean varargs,
-	String returnType,
-	String... parameterTypes) {
-		super(name, predeclared, parameterTypes);
-		this.returnType = returnType;
+	Func<Identifier> returnValueInitializer,
+	ArrayList<String> identifiers,
+	ArrayList<String> dataTypes) {
+		super(name, predeclared, identifiers, dataTypes);
+		returnValue = returnValueInitializer.invoke();
 	}
 	
 	public String getDataType() {
 		return "function";
 	}
 	
-	public String getReturnType() {
-		return returnType;
+	public Identifier returnValue() {
+		return returnValue;
 	}
 }

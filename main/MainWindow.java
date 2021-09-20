@@ -76,6 +76,10 @@ public class MainWindow {
 		self.console.setText("");
 	}
 	
+	public static Scanner scanner() {
+		return self.scanner;
+	}
+	
 	private static void setLine(int i) {
 		self.line = i;
 		
@@ -145,6 +149,65 @@ public class MainWindow {
 		createContents();
 		shlScanner.open();
 		shlScanner.layout();
+		
+		/*var boolean = Helper.infixToPostfix(
+				new LexemeTokenPair[] {
+						new LexemeTokenPair("x", "negation"),
+						new LexemeTokenPair("=", "number"),
+						new LexemeTokenPair("y", "number"),
+						new LexemeTokenPair("or", "operator"),
+						new LexemeTokenPair("z", "number")
+				},
+				Resources.boolean_operators0,
+				"not",
+				pair -> {
+					if (pair.token().equals("negation"))
+						return 3;
+					
+					switch (pair.lexeme()) {
+					case "and":
+					case "or":
+						return 1;
+					case "=":
+						return 2;
+					}
+					
+					return 0;
+				}
+		);*/
+		
+		/*var arithmetic = Helper.infixToPostfix(
+				new LexemeTokenPair[] {
+						new LexemeTokenPair("-", "negation"),
+						new LexemeTokenPair("(", "operator"),
+						new LexemeTokenPair("bob", "number"),
+						new LexemeTokenPair("+", "operator"),
+						new LexemeTokenPair("6", "number"),
+						new LexemeTokenPair(")", "operator"),
+						new LexemeTokenPair("*", "operator"),
+						new LexemeTokenPair("3", "number")
+				},
+				Resources.arithmetic_operators,
+				originalText,
+				pair -> {
+					if (pair.token().equals("negation"))
+						return 3;
+					
+					switch (pair.lexeme()) {
+					case "+":
+						return 1;
+					case "-":
+						return 1;
+					case "*":
+						return 2;
+					case "/":
+						return 2;
+					}
+					
+					return 0;
+				}
+		);*/
+		
 		while (!shlScanner.isDisposed()) {
 			if (!display.readAndDispatch()) {
 				display.sleep();
@@ -267,6 +330,8 @@ public class MainWindow {
 		console_input_submit.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
+				Interpreter.read(console_input.getText());
+				Interpreter.resume();
 			}
 		});
 		console_input_submit.setText("Submit");
